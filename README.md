@@ -35,7 +35,6 @@ To become a professional **Azure AI Engineer** — capable of designing, buildin
 This is an initial visualization of the final structure, and currently everything seen below is a placeholder, I will continue to update the structure as i progress my training.
 azure-ai-certification-journey/
 │
-├── README.md
 │
 ├── AI-901/
 │   ├── notes/
@@ -67,6 +66,8 @@ azure-ai-certification-journey/
 │       ├── nlp_analysis.py
 │       ├── document_intelligence.py
 │       └── README.md
+│
+├── README.md
 │
 └── resources.md
 ```
