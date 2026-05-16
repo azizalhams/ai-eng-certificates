@@ -25,7 +25,7 @@ To become a professional **Azure AI Engineer** — capable of designing, buildin
 | Certification | Full Name | Status | Target Date |
 |---|---|---|---|
 | AI-901 | Microsoft Certified: Azure AI Fundamentals | 🔄 In Progress | June 2026 |
-| AI-103 | Microsoft Certified: Azure AI App and Agent Developer Associate | 🔄 In Progress | August 2026 |
+| AI-103 | Microsoft Certified: Azure AI App and Agent Developer Associate | 🔄 In Progress | July 2026 |
 
 ---
 
@@ -138,13 +138,13 @@ An information extraction pipeline that processes PDFs, forms, images, and audio
 
 ## 📅 Study Timeline
 
-Started: **May 16, 2026** · Target completion: **August 2026** · Daily commitment: **3–4 hours/day**
+Started: **May 16, 2026** · Target completion: **July 2026** · Daily commitment: **3–4 hours/day**
 
 ```
-May 2026        Jun 2026        Jul 2026        Aug 2026
-├── AI-901 ────┤
-               ├── AI-103 ─────┤
-                                ├── MOS ─────────┤
+May 2026        Jun 2026        Jul 2026   
+├──── AI-901 ────┤
+                 ├─────── AI-103 ────────┤
+                                
 ```
 
 ---
