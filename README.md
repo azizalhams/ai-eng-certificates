@@ -32,6 +32,7 @@ To become a professional **Azure AI Engineer** — capable of designing, buildin
 ## 📁 Repository Structure
 
 ```
+This is an initial visualization of the final structure, and currently everything seen below is a placeholder, I will continue to update the structure as i progress my training.
 azure-ai-certification-journey/
 │
 ├── README.md
