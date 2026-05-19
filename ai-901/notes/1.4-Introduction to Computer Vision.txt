@@ -1,0 +1,35 @@
+The term "computer vision" refers to a range of tasks and techniques in which AI software processes visual input. 
+
+ 
+
+Image classification is a technique in which a model that has been trained with a large number of images is used to predict a text label based on an image's contents 
+
+ 
+
+Object detection models examine multiple regions in an image to find individual objects and their locations. 
+
+ 
+
+Semantic segmentation: In this approach, a model is trained to find objects, and classify individual pixels in the image based on the object to which they belong. 
+
+ 
+
+Contextual image analysis models are trained to find contextual relationships between objects in images and the text that describes them.  
+
+ 
+
+Convolutional neural network (CNN)s use filters to extract numeric feature maps from images, and then feed the feature values into a deep learning model to generate a label prediction. 
+
+ 
+
+1. Computer vision is based on the manipulation and analysis of what kinds of values in an image? 
+
+	Pixels 
+
+2. What is the primary role of filters in a convolutional neural network (CNN) used for image classification? 
+
+	To extract numeric features from images for use in a neural network. 
+
+3. Which description best matches a Vision Transformer (ViT? 
+
+	A model that uses attention to process image patches and create contextual embeddings. 

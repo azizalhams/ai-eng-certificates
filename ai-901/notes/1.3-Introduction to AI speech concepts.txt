@@ -1,0 +1,51 @@
+Common speech recognition scenarios (speech to text)
+This capability powers a wide range of business and consumer applications.
+	Customer service and support
+	Voice-activated assistants and agents
+	Meeting and interview transcription
+	Healthcare documentation
+
+Common speech synthesis scenarios (text to speech)
+This technology creates voices for applications that need to communicate information audibly.
+	Conversational AI and chatbots
+	Accessibility and content consumption
+	Notifications and alerts
+	E-learning and training
+	Entertainment and media
+
+Combining speech recognition and synthesis
+	Voice-driven customer service: Agents listen to customer questions (recognition), process the request, and respond with helpful answers (synthesis).
+	Interactive voice response (IVR) systems: Callers speak their needs, and the system guides them through options using natural dialogue.
+	Language learning applications: Students speak practice phrases (recognition), and the system provides feedback and corrections (synthesis).
+	Voice-controlled vehicles: Drivers give commands hands-free (recognition), and the system confirms actions and provides updates (synthesis).
+
+Pre-processing transforms the waveform into a compact representation that highlights speech characteristics while discarding irrelevant details like absolute volume.
+
+Mel-Frequency Cepstral Coefficients (MFCCs) mimics how the human ear perceives sound by emphasizing frequencies where speech energy concentrates and compressing less important ranges.
+	Divide audio into frames: Split the signal into overlapping 20–30 millisecond windows.
+	Apply Fourier transform: Convert each frame from time domain to frequency domain, revealing which pitches are present.
+	Map to Mel scale: Adjust frequency bins to match human hearing sensitivity—we distinguish low pitches better than high ones.
+	Extract coefficients: Compute a small set of numbers (often 13 coefficients) that summarize the spectral shape of each frame.
+
+Acoustic models learn the relationship between audio features and phonemes—the smallest units of sound that distinguish words.
+
+Language models resolve ambiguity by applying knowledge of vocabulary, grammar, and common word patterns.
+
+Decoding algorithms search through millions of possible word sequences to find the transcription that best matches both acoustic and language model predictions.
+
+Post-processing applies formatting rules and corrections to improve readability and accuracy.
+	Capitalization
+	Punctuation restoration
+	Number formatting
+	Profanity filtering
+	Inverse text normalization
+	Confidence scoring
+
+1. What activity happens during the pre-processing stage of speech recognition?
+	Feature vectors are extracted from the audio waveform for modeling.
+
+2. What are phonemes?
+	The smallest unit of sound in speech.
+
+3. Why is it important to generate prosody in speech synthesis?
+	Prosody ensures natural pronunciation and speech cadence.

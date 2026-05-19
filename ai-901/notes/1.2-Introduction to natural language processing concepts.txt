@@ -1,0 +1,38 @@
+Term Frequency - Inverse Document Frequency (TF-IDF) is a technique that calculates scores based on how often a word or term appears in one document compared to its more general frequency across the entire collection of documents. 
+
+	three-step process: 
+
+Calculate Term Frequency (TF): This is simply how many times a word appears in a document. For example, if the word "agent" appears 6 times in a document, then tf(agent) = 6. 
+
+Calculate Inverse Document Frequency (IDF): This checks how common or rare a word is across all documents. If a word appears in every document, it’s not special. The formula used to calculate IDF is idf(t) = log(N / df(t)) (where N is total number of documents and df(t) is the number of documents that contain the word t) 
+
+Combine them to calculate TF-IDF: Multiply TF and IDF to get the score: tfidf(t, d) = tf(t, d) * log(N / df(t)) 
+
+ 
+
+Bag-of-words is the name given to a feature extraction technique that represents text tokens as a vector of word frequencies or occurrences, ignoring grammar and word order. Example: email spam filtering. 
+
+ 
+
+TextRank is an unsupervised graph-based algorithm that models text as a network of connected nodes. 
+
+	Three steps: 
+
+Build a graph: Each sentence becomes a node, and edges that connect them are weighted by similarity 
+
+Calculate ranks iteratively: Each node's score is calculated based on the scores of the nodes connected to it. The formula is: TextRank(Sᵢ) = (1-d) + d * Σ(wⱼᵢ / Σwⱼₖ) * TextRank(Sⱼ) (where d is a damping factor, typically 0.85, wⱼᵢ is the weight of the edge from sentence j to sentence i, and the sum iterates over all sentences connected to i). 
+
+Extract top-ranked sentences: After convergence, the sentences with the highest scores are selected as the summary. 
+
+
+1. What is the purpose of tokenization? 
+
+	To break down text into smaller units for analysis. 
+
+2. Which of the following techniques is used to determine the importance of words in a specific document within the context of a larger collection of documents? 
+
+	TF-IDF (Term Frequency-Inverse Document Frequency) 
+
+3. Which of the following best describes the role of embedding vectors in natural language processing (NLP)? 
+
+	They capture semantic token relationships in multiple dimensions. 
