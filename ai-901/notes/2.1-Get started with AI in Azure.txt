@@ -1,0 +1,85 @@
+Azure provides four core categories of services:
+	Compute: The ability to run applications, programs, and workloads in the cloud.
+	Storage: Services that let you save and manage data in the cloud. 
+	Networking: Tools that connect your cloud resources to each other, to the internet, or to your organization.
+	App Services: Ready‑made platforms for building, hosting, and running applications without managing the underlying servers.
+
+Azure's organizational structure
+	An Azure tenant is an organization's home base and identity in Microsoft's cloud. This tenant is a dedicated and secure space where all the organization’s cloud resources live.
+	An Azure subscription is a billing container for your cloud resources. One tenant can contain one or many Azure subscriptions.
+	Resource groups (RGs) are folders that hold related Azure resources so you can manage them together. One subscription can have multiple resource groups. 
+	An Azure resource is any individual service or object you create in Azure such as a storage account, a database, or a Foundry resource.
+
+Security and networking
+	Azure is secure by design, offering built in identity, access control and network isolation to protect your AI solutions.
+	Azure also protects an AI application's secrets. A secret is any sensitive value that your AI application must keep hidden because it grants access to a system, service, or data.
+
+Hosting and scaling
+	To host and scale your applications, you can use Azure Kubernetes Service (AKS) for containerized workloads or Azure App Service to modernize and deploy web apps quickly. 
+	Scaling your applications means to automatically or manually adjust the amount of compute power your app uses
+		Scale out (horizontal): Add more instances
+		Scale up (vertical): Increase CPU/memory on the existing instance
+
+Data storage
+	AI apps need robust data storage. Data storage is any system or service used to save, organize, and retrieve data so that applications can use it later.
+	Azure offers multiple options:
+		Azure SQL Database for mission critical workloads
+		Azure Cosmos DB for real time globally distributed data
+		Azure Database for PostgreSQL for intelligent, scalable solutions
+
+Microsoft Foundry
+	A unified, enterprise-grade platform-as-a-service (PaaS) for building, deploying, and managing AI applications and agents.
+	Foundry offers models, the ability to choose models, use those models to build agents, connect those agents to tools, and integrate knowledge by using Foundry IQ, the centralized connection point for data sources.
+	Models:
+		OpenAI: GPT‑5, GPT‑5-mini, GPT‑5-nano, GPT‑5-chat/5.2-chat
+		Anthropic: Claude Opus 4.6/4.5, Sonnet
+		Mistral
+		Cohere
+		Meta LLaMA
+		DeepSeek
+		xAI’s Grok
+		Black Forest Labs
+		Gated (enterprise-governed) Hugging Face models
+	Agents:
+		Foundry is an agent‑first approach that lets developers build intelligent, task‑oriented agents directly within their Foundry projects. These agents can reason over inputs, call tools, interact with data, and automate 		workflows using the platform’s built‑in orchestration.
+	Tools:
+		Speech 
+		Vision
+		Language
+		Document intelligence
+	Knowledge:
+		Foundry IQ provides a permission‑aware, multi‑source knowledge layer that gives agents accurate, grounded answers using an organization’s own data.
+			Azure Blob Storage
+			SharePoint
+			OneLake
+			Public web data
+	Foundry resources and projects
+		A Foundry resource provides access to:
+			Models (Microsoft, partner, and OpenAI‑compatible)
+			Foundry’s agent service
+			Deployment governance
+			Monitoring & observability
+			Security boundaries
+			Quotas and operational controls
+		A Foundry Project lets you build and manage:
+			Agents
+			Evaluations
+			Files and datasets
+			Vector indexes
+			Flows (AI logic)
+			Connections
+			Project‑specific settings
+
+Microsoft Foundry endpoints
+	Microsoft Foundry resources are accessed through an API endpoint
+	The interfaces provided at the endpoint are known as Representational State Transfer Interfaces, or REST interfaces
+	Applications can only access it if they present the correct API key or a token confirming that your Microsoft Entra ID credentials are valid.
+
+1. Which statement best explains the relationship between AI and ML?
+	AI is the overarching goal of creating systems that exhibit human-like intelligence, while ML is a data-driven method used to achieve AI by learning patterns from data.
+2. How does Microsoft Foundry relate to Azure?
+	Foundry is built on top of Azure and uses Azure resources such as compute, networking, identity, and security to host and operate AI applications.
+3. Which statement best describes how keys, secrets, and endpoints work together in an Azure‑based AI application?
+	The endpoint is a URL for calling a deployed model, and the key (stored as a secret in Azure Key Vault) authenticates the request made to that endpoint.
+4. Which statement best describes a client application in the context of an AI solution built with Foundry?
+	A client application is a program the user interacts with—such as a web app or mobile app—that sends requests to a model endpoint and displays the response.
