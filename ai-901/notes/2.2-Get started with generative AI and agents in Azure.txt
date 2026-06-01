@@ -1,0 +1,41 @@
+dDeploying a model takes an AI model and makes it available for use in production through a stable, scalable, and secure endpoint.
+
+Deployment parameters that you can customize in Foundry include:
+	Deployment type: such as standard, global batch, and regional provisioned throughput, determine where and how inference is processed in Foundry. Deployment types are tied to throughput and data‑processing requirements.
+	Model version
+	Tokens per minute (TPM) rate limit
+		A token is the smallest unit of text or data that a generative AI model can process. Models break input into tokens—such as words, subwords, characters, or punctuation—so they can understand and generate language 			efficiently.
+
+When you deploy a model in Foundry, several things occur:
+	Compute resources are allocated: Foundry assigns the hardware needed to run the model—CPUs, GPUs, memory, networking, and scaling rules.
+	An API endpoint is created: You're able to securely invoke the model through the OpenAI Responses API, validated through management API checks.
+	Configuration (such as model version, response style, safety settings) is locked in
+	Monitoring and logging become active: usage metrics, performance, latency, errors, and costs are tracked
+
+In Microsoft Foundry, generative AI models and agents are related but serve different purposes.
+	Models = raw intelligence
+	Agents = packaged, task‑oriented workers built on top of that intelligence
+
+An agent in Microsoft Foundry is a packaged, reusable AI component that brings together three things:
+	A model: the generative AI model the agent uses for reasoning (for example, GPT‑4.1)
+	Instructions: the system prompt that defines the agent’s role, behavior, style, constraints, and output rules
+	Tools: the actions the agent can take	
+
+Agents can:
+	Call external tools (APIs, functions, retrieval) automatically
+	Break goals into structured steps
+	Maintain working memory during a conversation
+	Process user input, decide actions, and generate structured outputs
+
+1. What best describes Foundry's model catalog?
+	A central hub to discover, filter, compare, and test many generative AI models from multiple providers
+2. Which statement best describes a foundation model in Microsoft Foundry?
+	A large, pretrained model that provides general capabilities and can be used immediately or customized
+3. In the Foundry portal, what is the primary benefit of using the Model Playground before writing code?
+	It lets you test prompts, compare models, and capture working settings that you can reuse in code.
+4. What is the primary outcome of publishing an agent in Microsoft Foundry?
+	It converts the agent into a managed Azure resource with a stable endpoint that you can share and integrate without exposing your Foundry project or source code.
+5. In the Python example, which line is responsible for calling the published agent (rather than calling a model deployment directly) when generating a response?
+	response = openai_client.responses.create(input=[{'role': 'user', 'content': 'Tell me 
+	what you can help with.''}], extra_body={'agent': {'name': agent.name, 'type': 
+	'agent_reference'}},)
