@@ -1,0 +1,22 @@
+A general-purpose AI model is a language model trained on vast amounts of text data, giving it a broad understanding of language and the ability to handle many different tasks.
+	You can use a general-purpose AI model to handle text analysis tasks such as:
+		Key phrase extraction lists the main concepts from unstructured text.
+		Entity linking identifies known entities together with a link to Wikipedia.
+		Sentiment analysis and opinion mining identifies whether text is positive or negative.
+		Summarization summarizes text by identifying the most important information.
+
+The Model Context Protocol (MCP) is an open standard that defines how AI agents connect to external tools and data sources.
+	MCP uses a client-server architecture:
+		The MCP client is the AI agent (or the host application running the agent). It sends requests and receives responses.
+		The MCP server is the service that exposes tools, data, or actions. It listens for requests, executes the appropriate capability, and returns a structured result.
+	The Azure Language MCP server is a managed service that exposes Azure Language in Foundry Tools capabilities through MCP. It acts as the bridge between your agent and the full suite of Azure Language features
+		Follows the MCP standard.
+		You don't need to call the Azure Language REST API directly or manage authentication tokens in your agent code.
+
+1. You need to analyze text where the same input must return structured results based on statistical techniques. Which approach is most appropriate?
+	The Azure Language SDK, because it returns deterministic, structured output.
+2. What is the purpose of the client object in the Azure Language SDK?
+	It helps application code communicate with the Azure Language service.
+3. What is the main purpose of the Azure Language MCP server?
+	To expose Azure Language capabilities to agents through the Model Context Protocol.
+
