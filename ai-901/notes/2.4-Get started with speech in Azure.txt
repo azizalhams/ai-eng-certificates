@@ -1,0 +1,36 @@
+Speech recognition, speech-to-text (STT), is an AI capability that enables apps and agents to respond to spoken input.
+	Mainly uses two models:
+		Acoustic model that converts the audio into phonemes.
+		Language model that maps phonemes to words.
+
+	Developing an application
+		The Python SDK can be installed in the Visual Studio Code terminal using: pip install azure-cognitiveservices-speech
+		To use Azure Speech, you also need to create a Foundry resource. The Foundry resource endpoint and key is used in your code to authenticate your connection.
+		Consider the following Python code (2.4-recognition_code.txt). When you run it:
+			Your app initializes the Speech SDK: Provides an endpoint and authentication (key or Microsoft Entra ID)
+			Audio is captured or loaded: Microphone input or an audio file/stream
+			Audio is sent to Azure Speech: The SDK streams or uploads audio securely
+			Speech recognition runs in the cloud: Azure’s speech models analyze the audio
+			Text results are returned: Your app receives recognized text and optional metadata
+
+Speech synthesis, often called text-to-speech (TTS), is concerned with vocalizing data, usually by converting text to speech.
+	requires the following information:
+		The text to be spoken
+		The voice to be used to vocalize the speech
+	To synthesize speech, the system tokenizes the text to break it down into individual words, and assigns phonetic sounds to each word. 
+	It then breaks the phonetic transcription into prosodic units (such as phrases, clauses, or sentences). 
+	The system creates phonemes from the prosodic units. These phonemes are then synthesized as audio and can be assigned a particular voice, speaking rate, pitch, and volume.
+	Developing an application
+		Consider the following Python code ( .txt). When you run it:
+			Your app initializes the Speech SDK: Provides an endpoint and authentication (key or Microsoft Entra ID)
+			Text is provided
+			Text is sent to Azure Speech: The SDK handles the request and formatting
+			Speech synthesis runs in the cloud: Neural models generate audio
+			Audio is returned: Your app plays, streams, or saves the audio temporarily
+
+1. Why would a developer use the Azure Speech‑to‑Text SDK instead of only using the Foundry playground?
+	The SDK allows speech recognition to be added directly into application code.
+2. What does the Azure Text‑to‑Speech SDK handle for developers?
+	Authentication, network communication, and audio generation
+3. What role does the Voice Live Python SDK (azure-ai-voicelive) play in a voice‑enabled agent?
+	It opens a real‑time connection, streams audio, and handles spoken responses and interruptions
