@@ -1,0 +1,11 @@
+video generation:
+
+curl -X POST "https://abdelazizali127-0346-resource.services.ai.azure.com/videos" \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $AZURE_API_KEY" \
+-d '{
+    "prompt": "A video of a cat",
+    "model": "sora-2",
+    "size": "720x1280",
+    "seconds": "4"
+}'

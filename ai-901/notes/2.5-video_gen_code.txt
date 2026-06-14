@@ -1,0 +1,19 @@
+1. Create a video job
+curl -X POST "https://YOUR-RESOURCE-NAME.openai.azure.com/openai/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "api-key: $AZURE_OPENAI_API_KEY" \
+  -d '{
+    "model": "sora-2",
+    "prompt": "A cinematic close-up of raindrops sliding down a neon-lit window at night.",
+    "size": "1280x720",
+    "seconds": "8"
+  }'
+
+2. Poll job status until completed
+curl -X GET "https://YOUR-RESOURCE-NAME.openai.azure.com/openai/v1/videos/{video_id}" \
+  -H "api-key: $AZURE_OPENAI_API_KEY"
+
+3. Download the completed video
+curl -L "https://YOUR-RESOURCE-NAME.openai.azure.com/openai/v1/videos/{video_id}/content?variant=video" \
+  -H "api-key: $AZURE_OPENAI_API_KEY" \
+  --output output.mp4
