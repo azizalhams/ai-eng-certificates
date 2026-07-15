@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-901 Practice Exam — v3</title>
+<style>
+  :root{
+    --ink:#1a2332;
+    --paper:#f7f5f0;
+    --azure:#0f6cbd;
+    --azure-deep:#0a4d8c;
+    --line:#d8d3c4;
+    --good:#1c6e3e;
+    --good-bg:#e6f4ea;
+    --bad:#a02b2b;
+    --bad-bg:#fbe9e7;
+    --muted:#6b6557;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  header{
+    background:var(--azure-deep);
+    color:#fff;
+    padding:28px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-40px; top:-40px;
+    width:160px; height:160px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.06);
+  }
+  header h1{margin:0 0 4px;font-size:1.5rem;letter-spacing:-0.01em;}
+  header p{margin:0;color:#cfe3f5;font-size:0.9rem;}
+  .meta-row{
+    display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;
+    font-size:0.78rem;color:#cfe3f5;
+  }
+  .meta-row span{background:rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;}
+
+  #progress-bar-wrap{
+    position:sticky;top:0;z-index:10;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:10px 20px;
+  }
+  #progress-bar{height:6px;background:#e4ded0;border-radius:4px;overflow:hidden;}
+  #progress-fill{height:100%;background:var(--azure);width:0%;transition:width 0.25s ease;}
+  #progress-text{font-size:0.75rem;color:var(--muted);margin-top:6px;}
+
+  main{max-width:720px;margin:0 auto;padding:20px;}
+
+  .domain-divider{margin:30px 0 18px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  .domain-divider h2{font-size:1rem;margin:0;text-transform:uppercase;letter-spacing:0.04em;}
+  .domain-divider span{display:block;font-size:0.78rem;color:var(--muted);font-weight:400;margin-top:2px;text-transform:none;letter-spacing:normal;}
+
+  .q-card{
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:18px 18px 14px;margin-bottom:14px;transition:box-shadow 0.2s;
+  }
+  .q-num{font-size:0.72rem;font-weight:700;color:var(--azure);letter-spacing:0.04em;margin-bottom:6px;}
+  .q-tag{
+    display:inline-block;font-size:0.66rem;color:var(--muted);
+    border:1px solid var(--line);border-radius:10px;padding:1px 7px;
+    margin-left:6px;text-transform:uppercase;letter-spacing:0.03em;
+  }
+  .q-text{font-size:0.97rem;font-weight:600;margin:0 0 12px;color:var(--ink);}
+  .opt{
+    display:flex;align-items:flex-start;gap:10px;padding:9px 10px;
+    border-radius:7px;margin-bottom:6px;cursor:pointer;
+    border:1px solid transparent;font-size:0.92rem;
+  }
+  .opt:hover{background:#f0ede4;}
+  .opt input{margin-top:3px;accent-color:var(--azure);flex-shrink:0;}
+  .opt-label-letter{font-weight:700;color:var(--muted);}
+
+  .opt.correct-answer{background:var(--good-bg);border-color:var(--good);}
+  .opt.correct-answer .opt-label-letter{color:var(--good);}
+  .opt.wrong-pick{background:var(--bad-bg);border-color:var(--bad);}
+  .opt.wrong-pick .opt-label-letter{color:var(--bad);}
+
+  .q-status{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:0.85rem;}
+  .q-status.show{display:block;}
+  .q-status .tag{display:inline-block;font-weight:700;font-size:0.78rem;padding:2px 9px;border-radius:12px;margin-bottom:6px;}
+  .q-status .tag.right{background:var(--good-bg);color:var(--good);}
+  .q-status .tag.wrong{background:var(--bad-bg);color:var(--bad);}
+  .explain{color:var(--ink);opacity:0.85;}
+
+  .submit-zone{
+    position:fixed;bottom:0;left:0;right:0;
+    background:linear-gradient(0deg,var(--paper) 70%,rgba(247,245,240,0));
+    padding:26px 20px 18px;display:flex;justify-content:center;z-index:20;
+  }
+  #submitBtn{
+    background:var(--azure);color:#fff;border:none;
+    padding:13px 34px;font-size:0.95rem;font-weight:700;
+    border-radius:30px;cursor:pointer;
+    box-shadow:0 4px 14px rgba(15,108,189,0.35);
+    transition:transform 0.1s,background 0.2s;
+  }
+  #submitBtn:hover{background:var(--azure-deep);}
+  #submitBtn:active{transform:scale(0.97);}
+  #submitBtn:disabled{background:#aab2bd;box-shadow:none;cursor:not-allowed;}
+
+  #results-banner{display:none;max-width:720px;margin:0 auto 10px;padding:0 20px;}
+  .score-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;text-align:center;}
+  .score-card .big-score{font-size:2.6rem;font-weight:800;color:var(--azure-deep);line-height:1;}
+  .score-card .scaled{font-size:0.95rem;color:var(--muted);margin-top:4px;}
+  .pass-pill{display:inline-block;margin-top:12px;padding:6px 16px;border-radius:20px;font-weight:700;font-size:0.85rem;}
+  .pass-pill.pass{background:var(--good-bg);color:var(--good);}
+  .pass-pill.fail{background:var(--bad-bg);color:var(--bad);}
+  .domain-breakdown{display:flex;gap:10px;margin-top:16px;justify-content:center;flex-wrap:wrap;}
+  .domain-breakdown div{flex:1;min-width:140px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px;}
+  .domain-breakdown .d-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;}
+  .domain-breakdown .d-score{font-size:1.2rem;font-weight:700;color:var(--ink);}
+  #jumpToReview{
+    margin-top:16px;background:none;border:1px solid var(--azure);
+    color:var(--azure);padding:9px 18px;border-radius:20px;font-size:0.85rem;font-weight:700;cursor:pointer;
+  }
+
+  /* Export buttons */
+  .export-btns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .export-btn{
+    display:inline-flex;align-items:center;gap:6px;padding:9px 20px;
+    border-radius:20px;font-size:0.85rem;font-weight:700;cursor:pointer;
+    border:none;transition:opacity 0.15s,transform 0.1s;
+  }
+  .export-btn:hover{opacity:0.85;}
+  .export-btn:active{transform:scale(0.97);}
+  .export-btn.pdf{background:#0a4d8c;color:#fff;}
+  .export-btn.dl{background:#1c6e3e;color:#fff;}
+
+  body.submitted .opt{cursor:default;}
+  body.submitted .opt:hover{background:inherit;}
+  body:not(.submitted) .submit-zone{display:flex;}
+  body.submitted .submit-zone{display:none;}
+
+  /* Print */
+  @media print{
+    #progress-bar-wrap,.submit-zone,.export-btns,#jumpToReview{display:none!important;}
+    body{background:#fff!important;padding-bottom:0;}
+    header{background:#0a4d8c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .opt.correct-answer{background:#e6f4ea!important;border-color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .opt.wrong-pick{background:#fbe9e7!important;border-color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-status{display:block!important;}
+    .q-status .tag.right{background:#e6f4ea!important;color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-status .tag.wrong{background:#fbe9e7!important;color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .pass-pill.pass{background:#e6f4ea!important;color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .pass-pill.fail{background:#fbe9e7!important;color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-card{break-inside:avoid;page-break-inside:avoid;}
+    #results-banner{display:block!important;}
+    .score-card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AI-901 Practice Exam — v3</h1>
+  <p>Microsoft Azure AI Fundamentals — full-length practice run</p>
+  <div class="meta-row">
+    <span>50 questions</span>
+    <span>Pass mark 700/1000</span>
+    <span>Domain 1: Concepts &amp; Responsible AI</span>
+    <span>Domain 2: Microsoft Foundry</span>
+  </div>
+</header>
+
+<div id="progress-bar-wrap">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="progress-text">0 of 50 answered</div>
+</div>
+
+<div id="results-banner"></div>
+<main id="quiz-root"></main>
+
+<div class="submit-zone">
+  <button id="submitBtn" disabled>Answer all questions to submit</button>
+</div>
+
+<script>
+const QUESTIONS = [
+// ── DOMAIN 1: AI Concepts & Responsible AI (Q1–22) ──────────────────────────
+{d:1,multi:false,
+q:"An airline wants to forecast the exact number of passengers who will check in for each flight, based on historical booking data. What type of machine learning task is this?",
+opts:[
+  "Regression, because the model predicts a continuous numeric quantity",
+  "Classification, because the model assigns each flight to a predefined passenger-count category",
+  "Clustering, because the model groups similar flights based on booking patterns",
+  "Reinforcement learning, because the model adjusts predictions based on rewards for accuracy"
+],correct:[0],
+exp:"Predicting an exact numeric count (passengers) is a regression task. Classification assigns discrete categories, not precise numbers. Clustering groups unlabeled data without prediction. Reinforcement learning uses trial-and-error rewards, not historical labeled data."},
+
+{d:1,multi:false,
+q:"A resume-screening AI consistently rates candidates who attended certain universities more favorably, even when skills and experience are comparable to candidates from other schools. Which responsible AI principle is most at risk?",
+opts:[
+  "Fairness, because the system produces systematically different outcomes based on an attribute unrelated to qualification",
+  "Privacy and security, because resumes contain personal information about candidates' educational history",
+  "Transparency, because candidates are not shown the specific criteria used to evaluate their resumes",
+  "Reliability and safety, because the model's scoring may not be consistent across repeated evaluations"
+],correct:[0],
+exp:"Fairness requires that AI systems avoid systematic bias based on attributes unrelated to genuine qualification. While transparency and reliability are also legitimate considerations, the described pattern — favoring one group without merit-based justification — is fundamentally a fairness issue."},
+
+{d:1,multi:false,
+q:"A retail chatbot is trained on millions of general conversations, then adapted using a small set of company-specific product Q&A pairs to specialize its responses. What best describes this second step?",
+opts:[
+  "Fine-tuning, because the model's existing weights are further trained on a smaller, domain-specific dataset",
+  "Unsupervised pretraining, because the model learns patterns from unlabeled company documents",
+  "Reinforcement learning, because the model receives rewards for correctly answering product questions",
+  "Knowledge mining, because structured information is extracted from unstructured product documents"
+],correct:[0],
+exp:"Fine-tuning takes a pre-trained model and further trains it on a smaller, task-specific labeled dataset — exactly as described. Pretraining refers to the original large-scale training. Reinforcement learning requires a reward signal, not Q&A pairs. Knowledge mining extracts insights, it doesn't adapt models."},
+
+{d:1,multi:false,
+q:"Which metric would be most appropriate for evaluating a medical screening model where missing a true positive case (a sick patient) has severe consequences?",
+opts:[
+  "Accuracy, which measures the overall proportion of correct predictions across all cases",
+  "Recall, which measures the proportion of actual positive cases the model successfully identifies",
+  "Mean absolute error, which measures the average magnitude of prediction errors in continuous outputs",
+  "R-squared, which measures how well a regression model explains variance in the target variable"
+],correct:[1],
+exp:"Recall (sensitivity) measures how many actual positives were correctly identified — critical when missing positives is costly, as in medical screening. Accuracy can be misleading with imbalanced data. MAE and R-squared apply to regression tasks, not classification of sick/not-sick."},
+
+{d:1,multi:false,
+q:"Which of these best describes what the inclusiveness principle of responsible AI requires?",
+opts:[
+  "AI systems should provide clear, understandable explanations for the decisions they make",
+  "AI systems should be designed to consider and serve the needs of people across abilities, backgrounds, and circumstances",
+  "AI systems should be tested extensively before deployment to ensure consistent performance",
+  "AI systems should encrypt and protect any personal data they process or store"
+],correct:[1],
+exp:"Inclusiveness means designing AI to empower and engage people across the full range of human diversity, including disabilities and varied backgrounds. Explaining decisions is transparency. Rigorous testing is reliability and safety. Data protection is privacy and security."},
+
+{d:1,multi:false,
+q:"A model performs well on the specific city it was trained on but produces inaccurate results when deployed in a different city with different traffic patterns, demographics, or infrastructure. This is best described as:",
+opts:[
+  "Overfitting to the training city's specific characteristics, limiting the model's generalization to new locations",
+  "Class imbalance, because one city is overrepresented relative to others in the deployment dataset",
+  "Reinforcement learning failure, because the model has not received reward signals from the new city",
+  "Prompt injection, because the new city's data was maliciously crafted to confuse the model"
+],correct:[0],
+exp:"A model that fits training conditions too specifically and fails to generalize to new environments demonstrates overfitting — here, to geographic and infrastructure characteristics. Class imbalance concerns label distribution. RL failure and prompt injection are unrelated concepts to this scenario."},
+
+{d:1,multi:false,
+q:"An app allows a warehouse worker to point a tablet camera at a shelf and ask aloud, 'How many boxes are missing from this row?' The system must interpret speech, analyze the image, and generate a spoken answer. What combination of AI capabilities does this require?",
+opts:[
+  "Computer vision alone, since counting boxes is fundamentally an image analysis task",
+  "Natural language processing alone, since the interaction is driven by a spoken question and answer",
+  "Speech recognition, computer vision, and speech synthesis working together in a multimodal pipeline",
+  "Knowledge mining alone, since the system retrieves structured inventory information from a database"
+],correct:[2],
+exp:"This scenario requires speech-to-text (to understand the spoken question), computer vision (to analyze the shelf image), and text-to-speech (to respond aloud) — a multimodal pipeline. No single capability alone (vision only, NLP only, or knowledge mining only) covers the full task."},
+
+{d:1,multi:false,
+q:"A city government deploys a predictive policing tool without publishing documentation on how it works, what data it uses, or its known limitations, and without a way for citizens to contest its outputs. Which two responsible AI principles are most clearly compromised?",
+opts:[
+  "Fairness and inclusiveness, because the tool disproportionately impacts underrepresented communities",
+  "Reliability and safety, and privacy and security, because the tool has not been tested for robustness",
+  "Transparency and accountability, because the system lacks documentation and any mechanism for oversight or redress",
+  "Privacy and security, and fairness, because personal citizen data is processed without proper safeguards"
+],correct:[2],
+exp:"Transparency requires documentation of how a system works and its limitations. Accountability requires oversight and a means for affected people to contest outcomes. The scenario explicitly describes missing documentation and no contest mechanism — the defining features of these two principles being violated."},
+
+{d:1,multi:false,
+q:"A dataset used to train a facial recognition model contains 95% images of one skin tone and 5% of others. What is the most likely consequence, and what is this issue called?",
+opts:[
+  "Data drift; the model's accuracy will degrade over time regardless of the training data composition",
+  "Sampling bias; the model will likely perform worse on the underrepresented skin tones due to imbalanced training data",
+  "Overfitting; the model will memorize the majority class images instead of learning generalizable facial features",
+  "Prompt injection; the imbalance allows malicious actors to manipulate the model's outputs at inference time"
+],correct:[1],
+exp:"Sampling bias occurs when training data disproportionately represents certain groups, leading to worse performance for underrepresented groups — a well-documented issue in facial recognition. Data drift concerns changes over time post-deployment. Overfitting and prompt injection describe unrelated failure modes."},
+
+{d:1,multi:false,
+q:"Which of the following best distinguishes supervised learning from unsupervised learning?",
+opts:[
+  "Supervised learning uses labeled data with known outcomes; unsupervised learning finds patterns in data without predefined labels",
+  "Supervised learning requires neural networks; unsupervised learning only uses simpler statistical models",
+  "Supervised learning is used only for classification; unsupervised learning is used only for regression",
+  "Supervised learning processes text data; unsupervised learning processes only image and video data"
+],correct:[0],
+exp:"The defining distinction is the presence or absence of labeled data: supervised learning trains on inputs paired with known correct outputs, while unsupervised learning discovers structure in unlabeled data. The other statements about model types or data types are incorrect generalizations."},
+
+{d:1,multi:true,
+q:"Which of the following are examples of discriminative (predictive) AI, as opposed to generative AI? (Select all that apply)",
+opts:[
+  "A model that classifies incoming emails as spam or not spam",
+  "A model that writes an original short story based on a one-sentence prompt",
+  "A model that predicts the probability a customer will cancel their subscription",
+  "A model that generates a new piece of background music for a video game level",
+  "A model that groups retail customers into segments based on purchasing behavior"
+],correct:[0,2,4],
+exp:"Spam classification (A), churn probability prediction (C), and customer segmentation (E) are all discriminative tasks — they predict or categorize based on existing data. Writing a story (B) and generating music (D) create new content, which is the defining trait of generative AI."},
+
+{d:1,multi:false,
+q:"A company deploys a generative AI writing assistant but fails to inform employees that the tool logs and stores every draft they write for future model improvement. Which responsible AI principle is most directly compromised?",
+opts:[
+  "Privacy and security, because personal or sensitive employee content may be collected and retained without informed consent",
+  "Fairness, because the AI assistant may perform differently for different employees based on writing style",
+  "Reliability and safety, because logged drafts could be used to test the model's consistency over time",
+  "Inclusiveness, because employees with disabilities may be disproportionately affected by data logging"
+],correct:[0],
+exp:"Collecting and retaining potentially sensitive user content without informed consent is a privacy and security violation. The scenario does not describe differential treatment (fairness), safety testing (reliability), or disability-related impact (inclusiveness) — it centers entirely on undisclosed data collection."},
+
+{d:1,multi:false,
+q:"In a supervised learning model designed to predict a car's resale value, which of the following would be considered a feature rather than the label?",
+opts:[
+  "The predicted resale price the model outputs",
+  "The car's mileage, age, and accident history used as model inputs",
+  "The dataset split ratio used to separate training data from test data",
+  "The evaluation metric selected to measure the model's prediction error"
+],correct:[1],
+exp:"Features are the input variables used to make a prediction — mileage, age, and accident history. The predicted price is the label (the output). Data split ratios and evaluation metrics are part of the ML workflow, not features of individual records."},
+
+{d:1,multi:false,
+q:"A generative AI assistant is asked to write a biography of a real, living person and fabricates several events and quotes that never occurred, presenting them as fact. What is this phenomenon called, and why does it happen?",
+opts:[
+  "Overfitting; the model has memorized too many details about the person from its training data",
+  "Data drift; information about the person has changed since the model's training data was collected",
+  "Hallucination; the model generates plausible-sounding but fabricated content because it predicts likely text rather than verifying facts",
+  "Bias; the model's training data contained a disproportionate number of negative statements about the person"
+],correct:[2],
+exp:"Hallucination describes a model generating fabricated, confident-sounding content because it predicts statistically likely text patterns rather than retrieving verified facts. Overfitting relates to training performance, data drift to stale information, and bias to skewed representation — none matches fabricating false quotes and events."},
+
+{d:1,multi:false,
+q:"A company builds an AI hiring tool and forms a review board including HR professionals, legal counsel, ethicists, and representatives from employee resource groups to evaluate the tool before launch. This practice most directly supports which responsible AI principle?",
+opts:[
+  "Accountability, because it establishes cross-functional oversight and responsibility before deployment",
+  "Transparency, because it ensures the model's internal logic is documented in technical detail",
+  "Privacy and security, because it ensures candidate data is encrypted throughout the hiring process",
+  "Reliability and safety, because it validates the model's statistical accuracy on historical hiring data"
+],correct:[0],
+exp:"Establishing a diverse oversight board with clear review responsibility before launch is a hallmark of accountability — ensuring humans remain responsible for AI-driven decisions. It doesn't specifically address technical documentation (transparency), encryption (privacy), or statistical validation (reliability)."},
+
+{d:1,multi:false,
+q:"Which computer vision task would be used to determine the exact boundary and shape of a tumor within a medical scan, distinguishing it pixel-by-pixel from surrounding healthy tissue?",
+opts:[
+  "Image classification, which assigns a single 'tumor present' or 'tumor absent' label to the entire scan",
+  "Object detection, which draws a bounding box around the general region containing the tumor",
+  "Semantic segmentation, which classifies every individual pixel to precisely outline the tumor's shape",
+  "Optical character recognition, which extracts any printed annotations present on the scan image"
+],correct:[2],
+exp:"Semantic segmentation labels every pixel, producing a precise outline of irregular shapes like tumors. Image classification gives one label for the whole image. Object detection only provides a rectangular bounding box, not a precise shape. OCR reads text, not anatomical structures."},
+
+{d:1,multi:false,
+q:"Which of the following is a key difference between a small language model (SLM) and a large frontier language model?",
+opts:[
+  "SLMs can only process images, while large models can only process text",
+  "SLMs are generally more efficient and suited to resource-constrained or edge deployment, while large models typically offer broader general reasoning capability at higher compute cost",
+  "SLMs require significantly more GPU memory to run than large frontier models",
+  "SLMs cannot be deployed in Microsoft Foundry, while large models can only be deployed there"
+],correct:[1],
+exp:"SLMs (like the Phi family) trade some general capability for efficiency, making them well-suited to constrained environments. Large frontier models offer broader capability but need more compute. The claims about image-only/text-only processing, memory requirements, and Foundry deployment restrictions are all incorrect."},
+
+{d:1,multi:false,
+q:"A company wants to automatically flag social media posts that express strongly negative opinions about their brand for review by the PR team. Which NLP capability is most directly suited to this task?",
+opts:[
+  "Named entity recognition, which would identify the brand name mentioned within each post",
+  "Sentiment analysis, which would classify the emotional tone of each post as positive, negative, or neutral",
+  "Language detection, which would determine which language each social media post is written in",
+  "Key phrase extraction, which would surface the most frequently mentioned topics across all posts"
+],correct:[1],
+exp:"Sentiment analysis directly classifies emotional tone, allowing negative posts to be flagged. NER would find the brand name but not assess tone. Language detection identifies language, not sentiment. Key phrase extraction surfaces topics, not the emotional charge of each post."},
+
+{d:1,multi:false,
+q:"A generative AI model is configured with a low temperature and asked the same factual question multiple times. What behavior would you expect?",
+opts:[
+  "Highly varied answers each time, since low temperature maximizes randomness in token selection",
+  "Consistent, similar answers each time, since low temperature favors the most probable tokens and reduces randomness",
+  "The model will refuse to answer, since low temperature disables text generation entirely",
+  "The answers will get progressively longer each time, since low temperature increases the maximum token limit"
+],correct:[1],
+exp:"Low temperature makes token selection more deterministic, favoring the highest-probability tokens and producing more consistent, repeatable outputs. High temperature — not low — increases randomness. Temperature has no effect on refusal behavior or maximum token length."},
+
+{d:1,multi:true,
+q:"Which of the following scenarios represent an appropriate use of anomaly detection? (Select all that apply)",
+opts:[
+  "Flagging a credit card transaction that deviates sharply from a customer's normal spending pattern",
+  "Identifying unusual sensor readings on a factory machine that may indicate impending equipment failure",
+  "Translating a maintenance manual from English into German for an international engineering team",
+  "Detecting a sudden, unexplained spike in network traffic that could indicate a cyberattack",
+  "Summarizing the key points of a quarterly earnings call for company executives"
+],correct:[0,1,3],
+exp:"Anomaly detection identifies deviations from expected patterns: fraudulent transactions (A), abnormal equipment readings (B), and unusual network traffic (D) are all classic anomaly detection use cases. Translation (C) and summarization (E) are NLP tasks unrelated to detecting deviations from normal patterns."},
+
+{d:1,multi:false,
+q:"What is the primary reason organizations conduct red-teaming exercises on generative AI models before deployment?",
+opts:[
+  "To measure how quickly the model can generate responses under high user traffic load",
+  "To deliberately probe the model with adversarial or harmful prompts to uncover safety weaknesses before real users encounter them",
+  "To compare the model's benchmark accuracy against competing foundation models from other vendors",
+  "To calculate the exact per-token cost of running the model in a production environment"
+],correct:[1],
+exp:"Red-teaming involves intentionally trying to provoke harmful, biased, or unsafe outputs to identify and fix vulnerabilities before public release — a core responsible AI safety practice. It is not about performance load testing, competitive benchmarking, or cost calculation."},
+
+{d:1,multi:false,
+q:"Which of the following best explains why reinforcement learning is well-suited to training an AI agent to play a complex strategy game?",
+opts:[
+  "The agent can be trained entirely on a large fixed dataset of pre-labeled optimal moves",
+  "The agent learns by trial and error, receiving rewards for winning actions and penalties for losing ones, without needing labeled examples",
+  "The agent groups similar game states together using unsupervised clustering to simplify decision-making",
+  "The agent translates the game's rules from natural language into a formal set of logical constraints"
+],correct:[1],
+exp:"Reinforcement learning is ideal for sequential decision-making problems like games because the agent learns optimal strategies through reward/penalty feedback from its own actions, without requiring a labeled dataset of correct moves. The other options describe supervised learning, clustering, or rule translation — not RL."},
+
+// ── DOMAIN 2: Implementing AI Solutions with Microsoft Foundry (Q23–50) ─────
+{d:2,multi:false,
+q:"A developer is building a new generative AI application and needs to compare candidate foundation models on quality, cost, and latency before choosing one for production. Where in Microsoft Foundry would they do this?",
+opts:[
+  "In the Content Safety configuration panel, which evaluates model outputs for harmful content categories",
+  "In the Model Catalog, using built-in benchmarking and comparison tools across available foundation models",
+  "In the agent orchestration workflow builder, which is used to design multi-agent task pipelines",
+  "In the Azure AI Search index configuration, which manages document retrieval settings for RAG pipelines"
+],correct:[1],
+exp:"The Model Catalog provides benchmarking and side-by-side comparison tools for evaluating models on relevant criteria before deployment. Content Safety, agent orchestration, and Search indexing serve entirely different purposes in the platform."},
+
+{d:2,multi:false,
+q:"A company wants their AI agent to check real-time inventory levels from an internal SQL database before answering customer questions about product availability. What Foundry capability enables this?",
+opts:[
+  "Fine-tuning the model on a static export of historical inventory records",
+  "Increasing the model's context window so more inventory data can be pasted into each prompt",
+  "Connecting the database as a tool the agent can call to retrieve live data during a conversation",
+  "Applying a content safety filter configured to recognize inventory-related keywords"
+],correct:[2],
+exp:"Tool/function calling lets an agent query live external systems like a database in real time. Fine-tuning on a static export would quickly become outdated. Pasting data into prompts doesn't scale and isn't 'real-time.' Content safety filters block harmful content, not retrieve data."},
+
+{d:2,multi:false,
+q:"What is the primary function of Azure AI Document Intelligence's prebuilt invoice model?",
+opts:[
+  "It translates invoices written in foreign languages into the user's preferred language automatically",
+  "It generates new invoice templates based on a company's existing branding and formatting guidelines",
+  "It extracts common invoice fields — such as vendor name, invoice number, and total — without custom training",
+  "It flags invoices containing potentially fraudulent or duplicate transaction amounts for manual review"
+],correct:[2],
+exp:"The prebuilt invoice model is trained to recognize and extract standard invoice fields out of the box, with no custom model training required. It does not translate content, generate templates, or perform fraud detection — those require different services or custom logic."},
+
+{d:2,multi:false,
+q:"Which statement accurately describes the relationship between prompt engineering and retrieval-augmented generation (RAG)?",
+opts:[
+  "They are mutually exclusive techniques — an application must choose one or the other, never both",
+  "RAG is a form of fine-tuning that permanently updates the model's weights with retrieved documents",
+  "Prompt engineering shapes how instructions are structured, while RAG supplies the model with relevant retrieved content — they are often used together",
+  "Prompt engineering requires a labeled training dataset, while RAG requires no configuration at all"
+],correct:[2],
+exp:"Prompt engineering and RAG are complementary: prompt engineering structures instructions and behavior, while RAG dynamically supplies grounded, relevant content at query time. They are commonly combined. RAG does not modify model weights, and prompt engineering does not require labeled training data."},
+
+{d:2,multi:false,
+q:"A company wants to build a voice-controlled kiosk that understands spoken commands in noisy public environments and responds with synthesized speech. Which Azure AI service is the foundation for this solution?",
+opts:[
+  "Azure AI Vision, which processes images and video from the kiosk's camera to detect nearby customers",
+  "Azure AI Language, which analyzes the sentiment and key phrases within customer text messages",
+  "Azure AI Speech, which provides both speech-to-text recognition and text-to-speech synthesis capabilities",
+  "Azure AI Content Understanding, which extracts structured fields from scanned kiosk receipts"
+],correct:[2],
+exp:"Azure AI Speech provides both directions needed here: recognizing spoken commands (speech-to-text) and generating spoken responses (text-to-speech). Vision handles images, Language handles text sentiment/phrases, and Content Understanding extracts structured document data — none address the voice interaction requirement."},
+
+{d:2,multi:false,
+q:"In Microsoft Foundry, what does the 'relevance' evaluation metric assess about a generative AI model's responses?",
+opts:[
+  "Whether the response is grammatically fluent and free of spelling errors in the output language",
+  "Whether the response directly addresses the user's actual question rather than providing tangential or unrelated information",
+  "Whether the response was generated within the configured maximum token budget for the deployment",
+  "Whether the response avoids referencing competitor products or services by name"
+],correct:[1],
+exp:"Relevance measures how well a response actually addresses what the user asked, as opposed to being off-topic or tangential. Grammar/fluency is assessed separately as coherence. Token budget is a technical constraint, not a quality metric. Competitor mentions relate to content policy, not relevance."},
+
+{d:2,multi:false,
+q:"A developer configures a deployed model with a maximum output length, a defined system prompt, and a connected knowledge base, but notices the model still occasionally produces content violating the company's usage policy. What should be added to catch this at the platform level?",
+opts:[
+  "A higher temperature setting, so the model produces more conservative and predictable outputs",
+  "Content safety filters, configured to detect and block policy-violating categories of content in real time",
+  "A larger context window, so the model retains more conversation history for consistency",
+  "An increased frequency penalty, so the model avoids repeating previously generated phrases"
+],correct:[1],
+exp:"Content safety filters are specifically designed to catch and block policy-violating content (hate speech, violence, self-harm, etc.) at the platform level, independent of prompt engineering. Temperature affects randomness, not safety. Context window size and frequency penalty address unrelated aspects of output quality."},
+
+{d:2,multi:false,
+q:"A logistics company wants to analyze dashcam video footage to automatically flag moments where a driver's vehicle drifts out of its lane. Which Azure AI Vision capability is most directly applicable?",
+opts:[
+  "Optical character recognition, which reads road signs and license plates visible in the footage",
+  "Video-based object tracking and spatial analysis, which monitors the vehicle's position relative to lane boundaries over time",
+  "Face detection, which identifies and verifies the identity of the driver operating the vehicle",
+  "Image tagging, which assigns general descriptive labels such as 'road' or 'daytime' to individual frames"
+],correct:[1],
+exp:"Detecting lane drift requires tracking spatial position and movement over time across video frames — a spatial analysis / object tracking capability. OCR reads text, face detection identifies people, and image tagging provides generic scene labels — none track positional drift over time."},
+
+{d:2,multi:false,
+q:"What is the main advantage of using Microsoft Foundry's unified portal over provisioning and managing each Azure AI service (Vision, Language, Speech, Search) as separate standalone resources?",
+opts:[
+  "It removes the need to comply with any responsible AI or content safety requirements",
+  "It guarantees lower per-token pricing compared to using the services independently",
+  "It provides a single environment to discover models, build agents, connect tools, and monitor solutions end-to-end",
+  "It restricts developers to using only Microsoft's own first-party foundation models"
+],correct:[2],
+exp:"The unified portal centralizes model discovery, agent building, tool integration, evaluation, and monitoring into a single workflow. It does not eliminate responsible AI requirements, does not guarantee lower pricing, and supports models from multiple providers, not just Microsoft's own."},
+
+{d:2,multi:true,
+q:"Which of the following are legitimate reasons to use Azure AI Custom Vision rather than Azure AI Vision's prebuilt image analysis? (Select all that apply)",
+opts:[
+  "The organization needs to detect a highly specific, proprietary product defect not covered by general-purpose categories",
+  "The organization has a labeled dataset of images specific to their domain and wants to train a tailored classifier",
+  "The organization wants to identify broad, common object categories like 'person,' 'car,' or 'animal' with no custom training",
+  "The organization needs to detect specific brand logos that do not appear in general-purpose vision models",
+  "The organization wants to translate text found within images into another language"
+],correct:[0,1,3],
+exp:"Custom Vision is appropriate when standard categories don't cover the need: proprietary defects (A), domain-specific labeled training data (B), and custom brand logos (D) all justify a custom model. Broad common object detection (C) is exactly what prebuilt image analysis already covers. Translating text (E) requires Translator, not Custom Vision."},
+
+{d:2,multi:false,
+q:"An organization deploys an AI agent that can send emails, update calendar events, and modify records in a CRM system on behalf of users. Which consideration is most critical before granting the agent these capabilities?",
+opts:[
+  "Ensuring the agent's system prompt is written in a friendly and conversational tone",
+  "Ensuring the agent has access to the largest possible foundation model available in the catalog",
+  "Ensuring appropriate permission scoping, human approval checkpoints, and audit logging are in place for high-impact actions",
+  "Ensuring the agent's temperature setting is configured to maximize output creativity and variation"
+],correct:[2],
+exp:"When an agent can take real-world actions with consequences (sending emails, modifying records), permission controls, human-in-the-loop approval for high-impact actions, and audit trails are essential safeguards. Tone, model size, and creativity settings are unrelated to the risk of unsupervised autonomous actions."},
+
+{d:2,multi:false,
+q:"A developer notices that when users ask multi-part questions, their deployed model only answers the first part and ignores the rest. Which adjustment is most likely to help?",
+opts:[
+  "Reducing the temperature setting to make the model's responses more deterministic",
+  "Refining the system message to explicitly instruct the model to address every part of multi-part questions",
+  "Switching from a serverless deployment to a managed compute deployment for more processing power",
+  "Enabling content safety filters to catch incomplete responses before they reach the user"
+],correct:[1],
+exp:"This is a prompt engineering / instruction problem — explicitly telling the model in the system message to address all parts of a question directly targets the behavior. Temperature affects randomness, not completeness. Compute deployment type affects performance/cost, not instruction-following. Content safety filters block harmful content, not incomplete answers."},
+
+{d:2,multi:false,
+q:"Which scenario best illustrates an appropriate use of Azure AI Content Understanding rather than a general-purpose LLM prompt?",
+opts:[
+  "Generating a creative short story about a fictional company for a marketing campaign",
+  "Extracting structured fields — patient name, date of visit, diagnosis codes — from thousands of scanned medical intake forms with consistent layout",
+  "Brainstorming possible taglines for a new product launch based on a brief description",
+  "Answering open-ended customer questions about general product usage in a chatbot"
+],correct:[1],
+exp:"Content Understanding excels at structured, schema-based extraction across many similar documents at scale — exactly the medical intake form scenario. Creative writing, brainstorming, and open-ended Q&A are generative tasks better suited to a general-purpose LLM, not structured extraction."},
+
+{d:2,multi:false,
+q:"What does 'model grounding' refer to in the context of deploying a generative AI solution?",
+opts:[
+  "Reducing a model's file size so it can run efficiently on lower-powered edge devices",
+  "Anchoring a model's responses to specific, verifiable source data rather than relying solely on its trained parameters",
+  "Physically hosting a model's compute infrastructure in a specific geographic Azure region",
+  "Lowering a model's temperature setting to produce more consistent and repeatable outputs"
+],correct:[1],
+exp:"Grounding means anchoring model outputs to actual retrievable data (such as through RAG), reducing hallucination and improving factual accuracy. It is unrelated to file size compression, geographic hosting location, or temperature configuration."},
+
+{d:2,multi:false,
+q:"A company's AI agent occasionally calls the wrong tool for a given user request, or calls a tool with incorrect parameters. Which Foundry capability would best help the developer diagnose the root cause?",
+opts:[
+  "Content safety category configuration, which defines which harmful content types are filtered",
+  "Execution tracing, which provides a step-by-step log of the agent's reasoning, tool selection, and parameters used",
+  "The Model Catalog's benchmarking dashboard, which compares model accuracy across standard test sets",
+  "The billing and usage dashboard, which tracks token consumption and cost per deployment"
+],correct:[1],
+exp:"Execution tracing shows the agent's step-by-step decision process, including which tools it chose and what parameters it passed — essential for debugging incorrect tool use. Content safety, benchmarking, and billing dashboards serve different purposes and wouldn't reveal this specific issue."},
+
+{d:2,multi:false,
+q:"Which best describes how vector embeddings are typically used within a retrieval-augmented generation (RAG) architecture?",
+opts:[
+  "Documents and user queries are converted into numerical vectors, and similarity between them is used to retrieve the most relevant content",
+  "Vector embeddings replace the need for a system message by encoding all behavioral instructions numerically",
+  "Vector embeddings are used exclusively to compress image files before they are indexed for search",
+  "Vector embeddings convert generated text output back into human-readable language before display"
+],correct:[0],
+exp:"In RAG, both documents and queries are embedded as vectors, and similarity search (e.g., cosine similarity) identifies the most relevant content to retrieve. Embeddings don't replace system messages, aren't used for image compression, and don't convert output back to language — that's just standard text generation."},
+
+{d:2,multi:false,
+q:"A developer wants their AI application to summarize customer feedback and also tag each piece of feedback with a topic category like 'shipping,' 'quality,' or 'pricing.' Which combination of Azure AI Language features addresses both needs?",
+opts:[
+  "Sentiment analysis for summarization and named entity recognition for topic tagging",
+  "Text summarization to condense feedback and custom text classification to assign topic categories",
+  "Language detection to identify the feedback language and key phrase extraction to summarize content",
+  "Named entity recognition alone, since it can both summarize and categorize text simultaneously"
+],correct:[1],
+exp:"Text summarization condenses content, and custom text classification assigns predefined category labels — matching both stated needs exactly. Sentiment analysis measures tone, not summary content. Language detection identifies language, not topics. NER extracts named items; it doesn't summarize or classify into custom categories."},
+
+{d:2,multi:false,
+q:"Which of the following is the most appropriate reason to choose a managed compute deployment over a serverless deployment in Microsoft Foundry?",
+opts:[
+  "The application has unpredictable, low-volume traffic and needs to minimize costs during idle periods",
+  "The application requires consistently low latency and predictable performance under a stable, high-volume workload",
+  "The development team wants to avoid any responsibility for provisioning or managing infrastructure",
+  "The application is still in an early prototyping phase with no confirmed production traffic expectations"
+],correct:[1],
+exp:"Managed compute reserves dedicated resources, making it ideal for stable, high-volume workloads requiring predictable low latency. Serverless (pay-per-token, auto-scaling) is better suited for unpredictable or low-volume traffic, hands-off infrastructure preferences, and early prototyping — the opposite of options A, C, and D."},
+
+{d:2,multi:false,
+q:"A user tries to manipulate a customer-facing AI assistant by embedding hidden instructions inside an uploaded document, hoping the model will follow those instructions instead of its original guardrails when summarizing the document. What is this attack technique called?",
+opts:[
+  "Model inversion, which attempts to reconstruct training data by analyzing model outputs",
+  "Indirect prompt injection, where malicious instructions are hidden within external content the model processes",
+  "Data poisoning, which corrupts a model's training dataset to bias its future predictions",
+  "Denial of service, which overwhelms a model's infrastructure with excessive simultaneous requests"
+],correct:[1],
+exp:"Indirect prompt injection hides malicious instructions inside external content (like an uploaded document) that the model processes, attempting to override its intended behavior. Model inversion targets training data extraction, data poisoning corrupts training data itself, and denial of service targets infrastructure availability — all distinct attack types."},
+
+{d:2,multi:true,
+q:"Which of the following are appropriate steps when building a responsible, production-ready AI agent in Microsoft Foundry? (Select all that apply)",
+opts:[
+  "Configuring content safety filters appropriate to the application's audience and risk level",
+  "Scoping the agent's tool permissions to only what is necessary for its intended tasks",
+  "Skipping evaluation metrics like groundedness and relevance to speed up the deployment timeline",
+  "Establishing human review checkpoints for high-impact or irreversible actions the agent can take",
+  "Disabling all logging and tracing to reduce storage costs associated with the deployment"
+],correct:[0,1,3],
+exp:"Responsible deployment includes content safety configuration (A), least-privilege tool scoping (B), and human oversight for high-impact actions (D). Skipping evaluation (C) and disabling logging/tracing (E) both remove critical safeguards and are the opposite of responsible practice."},
+
+{d:2,multi:false,
+q:"A team wants their AI assistant's tone, scope of topics, and formatting rules to remain consistent across thousands of daily conversations without repeating instructions in every user turn. What Foundry configuration best achieves this?",
+opts:[
+  "A well-crafted system message applied once per session that persists across the conversation",
+  "A high temperature setting to encourage the model to maintain a consistent creative style",
+  "A larger max token limit so the model can include more context in each individual response",
+  "A content safety filter configured to reject any response that deviates from a fixed template"
+],correct:[0],
+exp:"The system message is designed exactly for this purpose — establishing persistent behavioral rules (tone, scope, format) that apply throughout a conversation without needing repetition. Temperature affects randomness, token limits affect length, and content safety filters block harmful content — none control consistent tone and formatting."},
+
+{d:2,multi:false,
+q:"An enterprise wants to deploy an internal AI assistant that can only answer questions using the company's approved internal documentation, and should decline to answer using general world knowledge. Which architecture best satisfies this requirement?",
+opts:[
+  "A base foundation model configured with a high temperature to encourage varied, exploratory responses",
+  "A RAG architecture with a system message instructing the model to answer only from retrieved company documents and decline otherwise",
+  "A fine-tuned model trained once on a snapshot of company documents from several years ago",
+  "A model with content safety filters configured to block any response mentioning competitor company names"
+],correct:[1],
+exp:"Combining RAG (grounding answers in current, approved documents) with explicit system message instructions to decline unsupported answers directly satisfies this scope-limiting requirement. High temperature encourages variation, not restriction. A stale fine-tuned snapshot wouldn't stay current. Content safety filters address harmful content, not knowledge scope."},
+
+{d:2,multi:false,
+q:"Which capability would allow a Microsoft Foundry agent to look up the current weather forecast in real time before recommending outdoor activities to a user?",
+opts:[
+  "Fine-tuning the model on historical weather data from the past several years",
+  "Configuring a tool/function call that connects the agent to a live weather API at query time",
+  "Increasing the model's temperature setting to produce more varied activity recommendations",
+  "Applying a content safety filter tuned specifically to weather-related terminology"
+],correct:[1],
+exp:"Tool/function calling allows an agent to query external, real-time data sources like a weather API during a conversation. Fine-tuning on historical data would not provide current conditions. Temperature affects randomness in wording, not access to live data. Content safety filters are unrelated to data retrieval."},
+
+{d:2,multi:false,
+q:"Which of the following most accurately describes what happens when a foundation model is fine-tuned on a custom dataset?",
+opts:[
+  "The model's underlying architecture is redesigned to add new layers specific to the custom task",
+  "The model's existing weights are further adjusted using the custom dataset, improving performance on that specific task or domain",
+  "The model's tokenizer is replaced entirely with a new tokenizer built exclusively from the custom dataset's vocabulary",
+  "The model is combined with a separate rules-based expert system to handle the custom domain's edge cases"
+],correct:[1],
+exp:"Fine-tuning adjusts a pre-trained model's existing weights using additional training on a smaller, task-specific dataset — it does not redesign the architecture, replace the tokenizer, or combine the model with a separate rules-based system, all of which are inaccurate descriptions of the process."},
+
+{d:2,multi:false,
+q:"A retail company wants shoppers to upload a photo of an item they're looking for and have the system find visually similar products in the catalog. Which capability underpins this kind of visual search?",
+opts:[
+  "Optical character recognition, which reads any text printed on the product packaging in the photo",
+  "Image embeddings combined with vector similarity search, which finds catalog items visually similar to the uploaded photo",
+  "Sentiment analysis, which evaluates the shopper's satisfaction based on the photo they uploaded",
+  "Named entity recognition, which extracts the brand name mentioned in the product photo's file name"
+],correct:[1],
+exp:"Visual search relies on converting images into embeddings (numerical vectors capturing visual features) and using similarity search to find visually related items — the same underlying pattern as text-based semantic search, applied to images. OCR, sentiment analysis, and NER are all unrelated to visual similarity matching."},
+
+{d:2,multi:false,
+q:"Within Microsoft Foundry, what is the purpose of setting up 'connected resources' for an AI agent?",
+opts:[
+  "To define which team members have billing access to the Azure subscription hosting the agent",
+  "To give the agent access to external tools, APIs, or data sources it can use while completing tasks",
+  "To specify which geographic Azure region the agent's compute infrastructure is physically located in",
+  "To configure the color scheme and branding of the chat interface presented to end users"
+],correct:[1],
+exp:"Connected resources give an agent access to external tools, APIs, and data sources (like SharePoint, databases, or custom functions) it can call on to complete tasks. Billing access, geographic region, and UI branding are all separate configuration concerns unrelated to connected resources."},
+
+{d:2,multi:false,
+q:"A company evaluates a deployed generative AI model and finds high groundedness scores but low coherence scores. What does this combination most likely indicate?",
+opts:[
+  "The model's answers are factually well-supported by source documents, but poorly structured, disjointed, or hard to follow",
+  "The model is fabricating information not present in any retrieved source document",
+  "The model is responding in the wrong language for the majority of user queries",
+  "The model is exceeding its configured maximum token output limit on most responses"
+],correct:[0],
+exp:"High groundedness means responses are well-supported by retrieved source content. Low coherence means the writing itself is poorly structured or difficult to follow, independent of factual accuracy. Fabrication would show as low groundedness, not high. Wrong language and token overflow are separate, unrelated issues."},
+
+{d:2,multi:false,
+q:"A developer wants an AI agent to draft an email reply but require a human to click 'Approve' before the email is actually sent to the customer. Which design pattern does this represent?",
+opts:[
+  "Fully autonomous execution, where the agent completes and finalizes tasks without any human involvement",
+  "Human-in-the-loop approval, where the agent proposes an action but a person must confirm before it is executed",
+  "Reinforcement learning, where the agent receives a reward each time its drafted email is approved",
+  "Fine-tuning, where the agent's underlying model is retrained based on which drafts get approved"
+],correct:[1],
+exp:"Requiring human confirmation before an agent's proposed action is executed is the human-in-the-loop pattern — a key responsible AI safeguard for consequential actions. Fully autonomous execution has no such checkpoint. RL and fine-tuning describe training processes, not this operational review workflow."}
+];
+
+const LETTERS = ['A','B','C','D','E'];
+const userAnswers = QUESTIONS.map(()=>new Set());
+let submitted = false;
+
+const root = document.getElementById('quiz-root');
+let currentDomain = null;
+
+QUESTIONS.forEach((item, qi) => {
+  if(item.d !== currentDomain){
+    currentDomain = item.d;
+    const div = document.createElement('div');
+    div.className = 'domain-divider';
+    div.innerHTML = currentDomain === 1
+      ? `<h2>Domain 1 — AI Concepts &amp; Responsible AI</h2><span>Questions 1–22 · ~44% of exam weight</span>`
+      : `<h2>Domain 2 — Implementing AI Solutions with Microsoft Foundry</h2><span>Questions 23–50 · ~56% of exam weight</span>`;
+    root.appendChild(div);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = 'card-' + qi;
+
+  const numDiv = document.createElement('div');
+  numDiv.className = 'q-num';
+  numDiv.textContent = 'QUESTION ' + (qi+1) + ' OF 50';
+  if(item.multi){
+    const tag = document.createElement('span');
+    tag.className = 'q-tag';
+    tag.textContent = 'Multi-select';
+    numDiv.appendChild(tag);
+  }
+  card.appendChild(numDiv);
+
+  const qText = document.createElement('p');
+  qText.className = 'q-text';
+  qText.textContent = item.q;
+  card.appendChild(qText);
+
+  item.opts.forEach((optText, oi) => {
+    const label = document.createElement('label');
+    label.className = 'opt';
+    label.id = `opt-${qi}-${oi}`;
+    const input = document.createElement('input');
+    input.type = item.multi ? 'checkbox' : 'radio';
+    input.name = 'q' + qi;
+    input.value = oi;
+    input.addEventListener('change', () => {
+      if(submitted) return;
+      if(item.multi){
+        if(input.checked) userAnswers[qi].add(oi); else userAnswers[qi].delete(oi);
+      } else {
+        userAnswers[qi] = new Set([oi]);
+      }
+      updateProgress();
+      saveProgress();
+    });
+    const letterSpan = document.createElement('span');
+    letterSpan.className = 'opt-label-letter';
+    letterSpan.textContent = LETTERS[oi] + '.';
+    const textSpan = document.createElement('span');
+    textSpan.textContent = optText;
+    label.appendChild(input);
+    label.appendChild(letterSpan);
+    label.appendChild(textSpan);
+    card.appendChild(label);
+  });
+
+  const status = document.createElement('div');
+  status.className = 'q-status';
+  status.id = 'status-' + qi;
+  card.appendChild(status);
+
+  root.appendChild(card);
+});
+
+function updateProgress(){
+  const answered = userAnswers.filter(s => s.size > 0).length;
+  document.getElementById('progress-fill').style.width = (answered/50*100) + '%';
+  document.getElementById('progress-text').textContent = answered + ' of 50 answered';
+  const btn = document.getElementById('submitBtn');
+  if(answered === 50){
+    btn.disabled = false;
+    btn.textContent = 'Submit exam';
+  } else {
+    btn.disabled = true;
+    btn.textContent = (50 - answered) + ' question' + (50-answered===1?'':'s') + ' remaining';
+  }
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  submitted = true;
+  document.body.classList.add('submitted');
+  sessionStorage.removeItem('ai901_v3');
+
+  let correctCount = 0;
+  let d1Total = 0, d1Correct = 0, d2Total = 0, d2Correct = 0;
+
+  QUESTIONS.forEach((item, qi) => {
+    const correctSet = new Set(item.correct);
+    const userSet = userAnswers[qi];
+    const isRight = correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x));
+    if(isRight) correctCount++;
+    if(item.d === 1){ d1Total++; if(isRight) d1Correct++; }
+    else { d2Total++; if(isRight) d2Correct++; }
+
+    item.opts.forEach((optText, oi) => {
+      const optEl = document.getElementById(`opt-${qi}-${oi}`);
+      const input = optEl.querySelector('input');
+      input.disabled = true;
+      if(correctSet.has(oi)){
+        optEl.classList.add('correct-answer');
+      } else if(userSet.has(oi)){
+        optEl.classList.add('wrong-pick');
+      }
+    });
+
+    const statusEl = document.getElementById('status-' + qi);
+    statusEl.classList.add('show');
+    statusEl.innerHTML = `<span class="tag ${isRight?'right':'wrong'}">${isRight?'Correct':'Incorrect'}</span><div class="explain">${item.exp}</div>`;
+  });
+
+  const pct = Math.round(correctCount/50*100);
+  const scaled = Math.round(correctCount/50*1000);
+  const passed = scaled >= 700;
+
+  const banner = document.getElementById('results-banner');
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="score-card">
+      <div class="big-score">${correctCount}/50</div>
+      <div class="scaled">${pct}% correct &nbsp;·&nbsp; scaled score ≈ ${scaled}/1000</div>
+      <div class="pass-pill ${passed?'pass':'fail'}">${passed?'PASS':'BELOW PASSING (700)'}</div>
+      <div class="domain-breakdown">
+        <div><div class="d-label">Domain 1 · Concepts</div><div class="d-score">${d1Correct}/${d1Total}</div></div>
+        <div><div class="d-label">Domain 2 · Foundry</div><div class="d-score">${d2Correct}/${d2Total}</div></div>
+      </div>
+      <br>
+      <button id="jumpToReview">Review all questions</button>
+      <div class="export-btns">
+        <button class="export-btn pdf" onclick="printPDF()">🖨️ Save as PDF</button>
+        <button class="export-btn dl" onclick="downloadHTML()">⬇️ Download Results HTML</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('jumpToReview').addEventListener('click', () => {
+    document.getElementById('card-0').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+/* ── sessionStorage: save & restore in-progress answers ── */
+function saveProgress(){
+  try{ sessionStorage.setItem('ai901_v3', JSON.stringify(userAnswers.map(s=>[...s]))); }catch(e){}
+}
+function restoreProgress(){
+  try{
+    const raw = sessionStorage.getItem('ai901_v3');
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    data.forEach((arr, qi) => {
+      if(!arr.length) return;
+      userAnswers[qi] = new Set(arr);
+      arr.forEach(oi => {
+        const input = document.querySelector(`input[name="q${qi}"][value="${oi}"]`);
+        if(input) input.checked = true;
+      });
+    });
+    updateProgress();
+  }catch(e){}
+}
+
+/* ── Save as PDF ── */
+function printPDF(){ window.print(); }
+
+/* ── Download static results HTML ── */
+function downloadHTML(){
+  const L = ['A','B','C','D','E'];
+  let correct=0,d1C=0,d1T=0,d2C=0,d2T=0;
+  const results = QUESTIONS.map((item,qi)=>{
+    const cs=new Set(item.correct),us=userAnswers[qi];
+    const ok=cs.size===us.size&&[...cs].every(x=>us.has(x));
+    if(ok)correct++;
+    if(item.d===1){d1T++;if(ok)d1C++;}else{d2T++;if(ok)d2C++;}
+    return{ok,cs,us};
+  });
+  const pct=Math.round(correct/50*100),scaled=Math.round(correct/50*1000),passed=scaled>=700;
+  const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  let qHTML='';let curD=null;
+  QUESTIONS.forEach((item,qi)=>{
+    const{ok,cs,us}=results[qi];
+    if(item.d!==curD){
+      curD=item.d;
+      qHTML+=curD===1
+        ?`<div class="dd"><h2>DOMAIN 1 — AI CONCEPTS &amp; RESPONSIBLE AI</h2><span>Questions 1–22 · ~44% of exam weight</span></div>`
+        :`<div class="dd"><h2>DOMAIN 2 — IMPLEMENTING AI SOLUTIONS WITH MICROSOFT FOUNDRY</h2><span>Questions 23–50 · ~56% of exam weight</span></div>`;
+    }
+    let optsHTML='';
+    item.opts.forEach((t,oi)=>{
+      const ic=cs.has(oi),iw=us.has(oi)&&!ic;
+      const cls=ic?'correct':iw?'wrong':'';
+      const icon=ic?'✓ ':iw?'✗ ':'';
+      optsHTML+=`<div class="opt ${cls}"><span class="lt">${icon}${L[oi]}.</span><span>${t}</span></div>`;
+    });
+    qHTML+=`<div class="qc"><div class="qn">QUESTION ${qi+1} OF 50${item.multi?' <span class="mt">MULTI-SELECT</span>':''}</div><div class="qt">${item.q}</div>${optsHTML}<div class="ex"><span class="badge ${ok?'right':'wrong'}">${ok?'Correct':'Incorrect'}</span>${item.exp}</div></div>`;
+  });
+
+  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AI-901 Results — ${date}</title><style>:root{--good:#1c6e3e;--good-bg:#e6f4ea;--bad:#a02b2b;--bad-bg:#fbe9e7;--azure:#0a4d8c;--line:#d8d3c4;--ink:#1a2332;--muted:#6b6557;}*{box-sizing:border-box;}body{margin:0;background:#f7f5f0;color:var(--ink);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.5;padding-bottom:40px;}header{background:var(--azure);color:#fff;padding:24px 20px 20px;}header h1{margin:0 0 4px;font-size:1.4rem;}header p{margin:0;color:#cfe3f5;font-size:.85rem;}main{max-width:700px;margin:0 auto;padding:20px;}.sc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;text-align:center;margin-bottom:24px;}.big{font-size:2.4rem;font-weight:800;color:var(--azure);line-height:1;}.sub{color:var(--muted);font-size:.9rem;margin-top:4px;}.pill{display:inline-block;margin-top:10px;padding:5px 16px;border-radius:20px;font-weight:700;font-size:.85rem;}.pill.pass{background:var(--good-bg);color:var(--good);}.pill.fail{background:var(--bad-bg);color:var(--bad);}.bk{display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;}.bk div{flex:1;min-width:120px;background:#f7f5f0;border:1px solid var(--line);border-radius:8px;padding:10px;}.dl{font-size:.7rem;color:var(--muted);text-transform:uppercase;}.ds{font-size:1.2rem;font-weight:700;}.dd{margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--ink);}.dd h2{font-size:.9rem;margin:0;letter-spacing:.04em;}.dd span{font-size:.74rem;color:var(--muted);}.qc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;page-break-inside:avoid;break-inside:avoid;}.qn{font-size:.7rem;font-weight:700;color:#0f6cbd;letter-spacing:.04em;margin-bottom:6px;}.mt{font-size:.6rem;background:#f0ede4;border:1px solid var(--line);border-radius:10px;padding:1px 6px;margin-left:6px;color:var(--muted);font-weight:400;}.qt{font-size:.95rem;font-weight:600;margin:0 0 10px;}.opt{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:7px;margin-bottom:5px;border:1px solid transparent;font-size:.88rem;}.opt.correct{background:var(--good-bg);border-color:var(--good);}.opt.wrong{background:var(--bad-bg);border-color:var(--bad);}.lt{font-weight:700;flex-shrink:0;min-width:22px;}.opt.correct .lt{color:var(--good);}.opt.wrong .lt{color:var(--bad);}.ex{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:.84rem;}.badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:6px;}.badge.right{background:var(--good-bg);color:var(--good);}.badge.wrong{background:var(--bad-bg);color:var(--bad);}@media print{body{background:#fff!important;}.opt.correct,.opt.wrong,.badge,.pill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.qc{break-inside:avoid;}}</style></head><body><header><h1>AI-901 Practice Exam — Results</h1><p>Completed ${date}</p></header><main><div class="sc"><div class="big">${correct}/50</div><div class="sub">${pct}% correct &nbsp;·&nbsp; scaled score ≈ ${scaled}/1000</div><div class="pill ${passed?'pass':'fail'}">${passed?'PASS':'BELOW PASSING (700)'}</div><div class="bk"><div><div class="dl">Domain 1 · Concepts</div><div class="ds">${d1C}/${d1T}</div></div><div><div class="dl">Domain 2 · Foundry</div><div class="ds">${d2C}/${d2T}</div></div></div></div>${qHTML}</main></body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='AI-901_Results_v3_'+new Date().toISOString().slice(0,10)+'.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+updateProgress();
+restoreProgress();
+</script>
+</body>
+</html>

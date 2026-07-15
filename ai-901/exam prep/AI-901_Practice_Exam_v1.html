@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-901 Practice Exam</title>
+<style>
+  :root{
+    --ink:#1a2332;
+    --paper:#f7f5f0;
+    --azure:#0f6cbd;
+    --azure-deep:#0a4d8c;
+    --line:#d8d3c4;
+    --good:#1c6e3e;
+    --good-bg:#e6f4ea;
+    --bad:#a02b2b;
+    --bad-bg:#fbe9e7;
+    --muted:#6b6557;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  header{
+    background:var(--azure-deep);
+    color:#fff;
+    padding:28px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-40px; top:-40px;
+    width:160px; height:160px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.06);
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:1.5rem;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:0;
+    color:#cfe3f5;
+    font-size:0.9rem;
+  }
+  .meta-row{
+    display:flex;
+    gap:14px;
+    margin-top:14px;
+    flex-wrap:wrap;
+    font-size:0.78rem;
+    color:#cfe3f5;
+  }
+  .meta-row span{
+    background:rgba(255,255,255,0.12);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+
+  #progress-bar-wrap{
+    position:sticky; top:0; z-index:10;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:10px 20px;
+  }
+  #progress-bar{
+    height:6px;
+    background:#e4ded0;
+    border-radius:4px;
+    overflow:hidden;
+  }
+  #progress-fill{
+    height:100%;
+    background:var(--azure);
+    width:0%;
+    transition:width 0.25s ease;
+  }
+  #progress-text{
+    font-size:0.75rem;
+    color:var(--muted);
+    margin-top:6px;
+  }
+
+  main{
+    max-width:720px;
+    margin:0 auto;
+    padding:20px;
+  }
+
+  .domain-divider{
+    margin:30px 0 18px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--ink);
+  }
+  .domain-divider h2{
+    font-size:1rem;
+    margin:0;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .domain-divider span{
+    display:block;
+    font-size:0.78rem;
+    color:var(--muted);
+    font-weight:400;
+    margin-top:2px;
+    text-transform:none;
+    letter-spacing:normal;
+  }
+
+  .q-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 14px;
+    margin-bottom:14px;
+    transition:box-shadow 0.2s;
+  }
+  .q-card.unanswered-flag{
+    border-color:var(--bad);
+  }
+  .q-num{
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--azure);
+    letter-spacing:0.04em;
+    margin-bottom:6px;
+  }
+  .q-tag{
+    display:inline-block;
+    font-size:0.66rem;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1px 7px;
+    margin-left:6px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .q-text{
+    font-size:0.97rem;
+    font-weight:600;
+    margin:0 0 12px;
+    color:var(--ink);
+  }
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:7px;
+    margin-bottom:6px;
+    cursor:pointer;
+    border:1px solid transparent;
+    font-size:0.92rem;
+  }
+  .opt:hover{
+    background:#f0ede4;
+  }
+  .opt input{
+    margin-top:3px;
+    accent-color:var(--azure);
+    flex-shrink:0;
+  }
+  .opt-label-letter{
+    font-weight:700;
+    color:var(--muted);
+  }
+
+  /* result states */
+  .opt.correct-answer{
+    background:var(--good-bg);
+    border-color:var(--good);
+  }
+  .opt.correct-answer .opt-label-letter{color:var(--good);}
+  .opt.wrong-pick{
+    background:var(--bad-bg);
+    border-color:var(--bad);
+  }
+  .opt.wrong-pick .opt-label-letter{color:var(--bad);}
+
+  .q-status{
+    display:none;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+    font-size:0.85rem;
+  }
+  .q-status.show{display:block;}
+  .q-status .tag{
+    display:inline-block;
+    font-weight:700;
+    font-size:0.78rem;
+    padding:2px 9px;
+    border-radius:12px;
+    margin-bottom:6px;
+  }
+  .q-status .tag.right{background:var(--good-bg); color:var(--good);}
+  .q-status .tag.wrong{background:var(--bad-bg); color:var(--bad);}
+  .explain{color:var(--ink); opacity:0.85;}
+
+  .submit-zone{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:linear-gradient(0deg, var(--paper) 70%, rgba(247,245,240,0));
+    padding:26px 20px 18px;
+    display:flex;
+    justify-content:center;
+    z-index:20;
+  }
+  #submitBtn{
+    background:var(--azure);
+    color:#fff;
+    border:none;
+    padding:13px 34px;
+    font-size:0.95rem;
+    font-weight:700;
+    border-radius:30px;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(15,108,189,0.35);
+    transition:transform 0.1s, background 0.2s;
+  }
+  #submitBtn:hover{background:var(--azure-deep);}
+  #submitBtn:active{transform:scale(0.97);}
+  #submitBtn:disabled{
+    background:#aab2bd;
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+
+  #results-banner{
+    display:none;
+    max-width:720px;
+    margin:0 auto 10px;
+    padding:0 20px;
+  }
+  .score-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:22px;
+    text-align:center;
+  }
+  .score-card .big-score{
+    font-size:2.6rem;
+    font-weight:800;
+    color:var(--azure-deep);
+    line-height:1;
+  }
+  .score-card .scaled{
+    font-size:0.95rem;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  .pass-pill{
+    display:inline-block;
+    margin-top:12px;
+    padding:6px 16px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:0.85rem;
+  }
+  .pass-pill.pass{background:var(--good-bg); color:var(--good);}
+  .pass-pill.fail{background:var(--bad-bg); color:var(--bad);}
+
+  .domain-breakdown{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .domain-breakdown div{
+    flex:1;
+    min-width:140px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+  }
+  .domain-breakdown .d-label{font-size:0.72rem; color:var(--muted); text-transform:uppercase;}
+  .domain-breakdown .d-score{font-size:1.2rem; font-weight:700; color:var(--ink);}
+
+  #jumpToReview{
+    margin-top:16px;
+    background:none;
+    border:1px solid var(--azure);
+    color:var(--azure);
+    padding:9px 18px;
+    border-radius:20px;
+    font-size:0.85rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  body.submitted .opt{cursor:default;}
+  body.submitted .opt:hover{background:inherit;}
+  body:not(.submitted) .submit-zone{display:flex;}
+  body.submitted .submit-zone{display:none;}
+
+  /* Export buttons */
+  .export-btns{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .export-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 20px;
+    border-radius:20px;
+    font-size:0.85rem;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+    transition:opacity 0.15s, transform 0.1s;
+  }
+  .export-btn:hover{opacity:0.85;}
+  .export-btn:active{transform:scale(0.97);}
+  .export-btn.pdf{background:#0a4d8c;color:#fff;}
+  .export-btn.dl{background:#1c6e3e;color:#fff;}
+
+  /* Print styles — used by Save as PDF */
+  @media print{
+    #progress-bar-wrap,.submit-zone,.export-btns,#jumpToReview{display:none!important;}
+    body{background:#fff!important;padding-bottom:0;}
+    header{background:#0a4d8c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .opt.correct-answer{background:#e6f4ea!important;border-color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .opt.wrong-pick{background:#fbe9e7!important;border-color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-status{display:block!important;}
+    .q-status .tag.right{background:#e6f4ea!important;color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-status .tag.wrong{background:#fbe9e7!important;color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .pass-pill.pass{background:#e6f4ea!important;color:#1c6e3e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .pass-pill.fail{background:#fbe9e7!important;color:#a02b2b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-card{break-inside:avoid;page-break-inside:avoid;}
+    #results-banner{display:block!important;}
+    .score-card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AI-901 Practice Exam</h1>
+  <p>Microsoft Azure AI Fundamentals — full-length practice run</p>
+  <div class="meta-row">
+    <span>50 questions</span>
+    <span>Pass mark 700/1000</span>
+    <span>Domain 1: Concepts & Responsible AI</span>
+    <span>Domain 2: Microsoft Foundry</span>
+  </div>
+</header>
+
+<div id="progress-bar-wrap">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="progress-text">0 of 50 answered</div>
+</div>
+
+<div id="results-banner"></div>
+
+<main id="quiz-root"></main>
+
+<div class="submit-zone">
+  <button id="submitBtn" disabled>Answer all questions to submit</button>
+</div>
+
+<script>
+const QUESTIONS = [
+{d:1, multi:false, q:"Which AI workload type would you use to extract handwritten text from a scanned invoice?", opts:["Natural language processing","Computer vision","Knowledge mining","Generative AI"], correct:[1], exp:"Reading text from images (including handwriting) is a computer vision (OCR) task."},
+{d:1, multi:false, q:"A retail company wants a system that predicts how many units of a product will sell next month based on historical sales data. What type of machine learning is this?", opts:["Classification","Clustering","Regression","Reinforcement learning"], correct:[2], exp:"Predicting a continuous numeric value (units sold) is regression."},
+{d:1, multi:false, q:"Which responsible AI principle is most directly addressed by ensuring a facial recognition system performs equally well across different demographic groups?", opts:["Transparency","Fairness","Privacy and security","Accountability"], correct:[1], exp:"Equal performance across demographic groups is the definition of fairness."},
+{d:1, multi:false, q:"You are grouping customers into segments based on purchasing behavior, without predefined labels. This is an example of:", opts:["Supervised learning — classification","Supervised learning — regression","Unsupervised learning — clustering","Reinforcement learning"], correct:[2], exp:"Grouping data without predefined labels is unsupervised clustering."},
+{d:1, multi:false, q:"Which of the following is an example of an AI workload that uses Natural Language Processing (NLP)?", opts:["Detecting objects in a photo","Summarizing a customer support transcript","Forecasting stock prices","Generating a 3D model from text"], correct:[1], exp:"Summarizing text is an NLP task."},
+{d:1, multi:false, q:"A hospital uses an AI system to recommend treatment plans. Which responsible AI principle requires that clinicians can understand why the AI made a specific recommendation?", opts:["Inclusiveness","Transparency","Reliability and safety","Privacy and security"], correct:[1], exp:"Allowing humans to understand model reasoning is transparency."},
+{d:1, multi:false, q:"What is the primary difference between classification and regression in supervised machine learning?", opts:["Classification predicts categories; regression predicts continuous numeric values","Classification requires labeled data; regression does not","Regression predicts categories; classification predicts continuous numeric values","There is no difference — they are interchangeable terms"], correct:[0], exp:"Classification predicts discrete categories; regression predicts continuous values."},
+{d:1, multi:false, q:"Which scenario best describes 'knowledge mining'?", opts:["Training a model to play a video game through trial and error","Extracting structured insights and searchable content from large volumes of unstructured documents","Generating new marketing copy from a prompt","Detecting anomalies in sensor data"], correct:[1], exp:"Knowledge mining extracts structured, searchable insights from unstructured content."},
+{d:1, multi:false, q:"A company deploys a chatbot but does not disclose to users that they are talking to an AI rather than a human. This violates which responsible AI principle?", opts:["Accountability","Transparency","Fairness","Reliability and safety"], correct:[1], exp:"Failing to disclose AI interaction violates transparency."},
+{d:1, multi:false, q:"Which of the following best describes a 'large language model' (LLM)?", opts:["A model trained only on numerical tabular data","A model trained on vast amounts of text that can generate and understand natural language","A model that only classifies images","A rules-based expert system with no training data"], correct:[1], exp:"LLMs are trained on massive text corpora to understand/generate language."},
+{d:1, multi:true, q:"Which of the following are core principles of responsible AI as defined by Microsoft? (Select all that apply)", opts:["Fairness","Profitability","Privacy and security","Accountability","Maximum automation"], correct:[0,2,3], exp:"Fairness, Privacy and security, and Accountability are core responsible AI principles (not profitability or 'maximum automation')."},
+{d:1, multi:false, q:"What is 'data drift' in the context of a deployed machine learning model?", opts:["A change in model architecture during training","A change in the statistical properties of input data over time, which can degrade model accuracy","The process of cleaning a dataset before training","A type of encryption applied to training data"], correct:[1], exp:"Data drift is when input data statistics shift over time, degrading accuracy."},
+{d:1, multi:false, q:"Which AI workload would be most appropriate for translating customer reviews from Spanish to English?", opts:["Computer vision","Natural language processing","Anomaly detection","Knowledge mining"], correct:[1], exp:"Translation is an NLP task."},
+{d:1, multi:false, q:"An AI system used in hiring consistently ranks candidates from one ethnic background lower than equally qualified candidates from another. This is primarily a failure of which principle?", opts:["Reliability and safety","Fairness","Transparency","Inclusiveness"], correct:[1], exp:"Systematic disadvantage to a group based on ethnicity is a fairness failure."},
+{d:1, multi:false, q:"Which of the following is an example of reinforcement learning?", opts:["A spam filter trained on labeled emails","A robot learning to walk by receiving rewards for forward movement and penalties for falling","Grouping news articles by topic similarity","Predicting house prices from square footage"], correct:[1], exp:"Reward/penalty-based learning through trial and error is reinforcement learning."},
+{d:1, multi:false, q:"What does 'inclusiveness' mean in the context of responsible AI?", opts:["AI systems should be open-source","AI systems should empower and engage people of all abilities and backgrounds","AI systems should only be used by enterprises","AI systems should minimize computational cost"], correct:[1], exp:"Inclusiveness means designing AI to engage and empower people of all abilities/backgrounds."},
+{d:1, multi:false, q:"Which scenario describes anomaly detection?", opts:["Identifying fraudulent transactions that deviate from normal spending patterns","Translating a document into another language","Summarizing a long article","Generating an image from a text description"], correct:[0], exp:"Detecting deviations from normal patterns (fraud) is anomaly detection."},
+{d:1, multi:false, q:"A generative AI model produces a confident but factually incorrect response. This phenomenon is commonly known as:", opts:["Overfitting","Hallucination","Data drift","Underfitting"], correct:[1], exp:"Confidently stating false information is called hallucination."},
+{d:1, multi:false, q:"Which principle of responsible AI is concerned with ensuring clear lines of responsibility for the outcomes of an AI system?", opts:["Accountability","Inclusiveness","Fairness","Privacy and security"], correct:[0], exp:"Clear responsibility for outcomes is accountability."},
+{d:1, multi:false, q:"What is the main purpose of a 'prompt' in generative AI?", opts:["To label training data for supervised learning","To provide input instructions or context that guide the model's generated output","To encrypt data before processing","To evaluate model accuracy"], correct:[1], exp:"A prompt provides input/context to guide generated output."},
+{d:1, multi:false, q:"Which AI capability would best support a multimodal application that needs to answer questions about the content of an uploaded image?", opts:["Text-only NLP","Vision-language (multimodal) model","Regression model","Clustering algorithm"], correct:[1], exp:"Answering questions about image content requires a multimodal (vision+language) model."},
+{d:1, multi:true, q:"Which of the following are common AI workload categories covered by Azure AI services? (Select all that apply)", opts:["Computer vision","Natural language processing","Database indexing","Knowledge mining","Network load balancing"], correct:[0,1,3], exp:"Computer vision, NLP, and knowledge mining are AI workload categories; database indexing and load balancing are infrastructure concerns, not AI workloads."},
+
+{d:2, multi:false, q:"In Microsoft Foundry, what is the primary purpose of the Model Catalog?", opts:["To store billing information","To browse, compare, and deploy foundation models from Microsoft and partner providers","To manage user identity and access","To monitor network traffic"], correct:[1], exp:"The Model Catalog is for browsing/comparing/deploying foundation models."},
+{d:2, multi:false, q:"Which Microsoft Foundry feature allows you to connect an AI agent to external tools and data sources, such as SharePoint or a custom API?", opts:["Content Understanding","Tools / connected resources","Prompt flow visualization only","Model benchmarking"], correct:[1], exp:"Tools/connected resources let agents access external systems like SharePoint."},
+{d:2, multi:false, q:"You need to deploy a model in Microsoft Foundry to generate responses to customer queries via an API. What is the typical first step?", opts:["Train a model from scratch using raw text files","Select and deploy a model from the Model Catalog to create an endpoint","Configure a virtual network gateway","Create a Power BI dashboard"], correct:[1], exp:"You select and deploy a model from the catalog to get an inference endpoint."},
+{d:2, multi:false, q:"What is the purpose of Azure AI Content Understanding?", opts:["To generate images from text prompts","To extract structured information (fields, tables, entities) from documents, images, audio, and video","To translate speech in real time","To train custom regression models"], correct:[1], exp:"Content Understanding extracts structured data from documents, images, audio, and video."},
+{d:2, multi:false, q:"Which component in Microsoft Foundry enables building multi-step, multi-agent workflows where agents can hand off tasks to one another?", opts:["Visual agent/workflow orchestration","Model Catalog only","Content Understanding","Speech Studio"], correct:[0], exp:"Visual agent/workflow orchestration enables multi-agent handoff workflows."},
+{d:2, multi:false, q:"You want an AI agent to autonomously call an external weather API as part of answering a user's question. Which capability does this require?", opts:["Fine-tuning","Tool/function calling","Data labeling","Clustering"], correct:[1], exp:"Calling external APIs autonomously requires tool/function calling."},
+{d:2, multi:false, q:"Which Azure AI service would you use to convert spoken audio from a customer call into text for further analysis?", opts:["Azure AI Vision","Azure AI Speech","Azure AI Language","Azure AI Content Understanding"], correct:[1], exp:"Azure AI Speech handles speech-to-text conversion."},
+{d:2, multi:false, q:"What is the purpose of a system message (or system prompt) when configuring a generative AI model in Foundry?", opts:["To define the model's overarching behavior, tone, and constraints before user interaction","To store the model's training data","To encrypt API keys","To benchmark model latency"], correct:[0], exp:"A system message sets overarching behavior/tone/constraints for the model."},
+{d:2, multi:false, q:"Which Azure AI Vision capability would identify and label objects such as 'dog,' 'car,' and 'tree' within a photo?", opts:["Optical character recognition (OCR)","Object detection","Face verification","Speaker recognition"], correct:[1], exp:"Identifying and labeling objects in an image is object detection."},
+{d:2, multi:false, q:"A developer wants to test multiple foundation models side-by-side for accuracy, cost, and latency before choosing one for production. Which Foundry feature supports this?", opts:["Model benchmarking/comparison tools in the Model Catalog","Content Understanding","Speech Studio","Network Watcher"], correct:[0], exp:"Foundry's Model Catalog includes benchmarking/comparison tools."},
+{d:2, multi:false, q:"Which Azure AI Language feature would determine whether a product review is positive, negative, or neutral?", opts:["Entity recognition","Sentiment analysis","Language detection","Key phrase extraction"], correct:[1], exp:"Sentiment analysis determines positive/negative/neutral tone."},
+{d:2, multi:false, q:"What does 'grounding' a generative AI model with your own data (e.g., via retrieval-augmented generation) primarily help achieve?", opts:["Faster model training","More accurate, relevant responses based on your organization's specific content","Reduced need for an API key","Automatic image generation"], correct:[1], exp:"Grounding with your own data improves accuracy/relevance of responses."},
+{d:2, multi:false, q:"Which Microsoft Foundry capability lets you index your organization's documents so a model can retrieve relevant content at query time?", opts:["Azure AI Search integration (RAG)","Object detection","Speaker verification","Sentiment analysis"], correct:[0], exp:"Azure AI Search integration (RAG) indexes documents for retrieval at query time."},
+{d:2, multi:false, q:"You need to extract key-value pairs (e.g., invoice number, total amount) from scanned invoices in various layouts. Which capability is best suited?", opts:["Azure AI Content Understanding / Document Intelligence","Azure AI Speech","Clustering algorithm","Image classification"], correct:[0], exp:"Document Intelligence/Content Understanding extracts key-value pairs from varied document layouts."},
+{d:2, multi:false, q:"Which of the following best describes an 'AI agent' as implemented in Microsoft Foundry?", opts:["A static dashboard showing model metrics","An autonomous or semi-autonomous system that uses a model plus tools/instructions to complete multi-step tasks","A type of storage account","A network security rule"], correct:[1], exp:"An AI agent autonomously uses a model + tools/instructions to complete tasks."},
+{d:2, multi:false, q:"What is a primary purpose of evaluating a deployed generative AI model in Foundry (e.g., for groundedness, relevance, coherence)?", opts:["To reduce Azure billing costs automatically","To measure and improve the quality and safety of model outputs before/after deployment","To compress the model size","To translate the model into other programming languages"], correct:[1], exp:"Evaluation measures/improves quality and safety of outputs."},
+{d:2, multi:false, q:"Which Azure AI service would best support building a custom image classification model to sort product photos into categories with minimal coding?", opts:["Azure AI Custom Vision","Azure AI Speech","Azure AI Translator","Azure AI Content Understanding"], correct:[0], exp:"Azure AI Custom Vision builds custom image classification models with minimal coding."},
+{d:2, multi:true, q:"Which of the following are typical components you configure when deploying a generative AI solution in Microsoft Foundry? (Select all that apply)", opts:["Model selection from the catalog","System message/instructions","Connected data sources or tools","Physical server rack placement","Network cable routing"], correct:[0,1,2], exp:"Model selection, system message, and connected tools/data are typical deployment configuration steps; physical infrastructure isn't something you configure in Foundry."},
+{d:2, multi:false, q:"What is the role of 'content safety' filters in Microsoft Foundry model deployments?", opts:["To block or flag harmful, offensive, or risky content in inputs and outputs","To increase model response speed","To manage billing thresholds","To compress images before upload"], correct:[0], exp:"Content safety filters block/flag harmful or risky content."},
+{d:2, multi:false, q:"A company wants to build a voice assistant that recognizes specific employees by their voice. Which capability is needed?", opts:["Speaker recognition (in Azure AI Speech)","Sentiment analysis","Key phrase extraction","Object detection"], correct:[0], exp:"Speaker recognition identifies individuals by voice."},
+{d:2, multi:false, q:"Which statement best describes the difference between prompt engineering and fine-tuning?", opts:["Prompt engineering retrains model weights; fine-tuning only changes the input text","Prompt engineering crafts input instructions to guide existing model behavior; fine-tuning further trains the model on custom data to adjust its weights","They are the same process","Fine-tuning is only used for computer vision models"], correct:[1], exp:"Prompt engineering shapes input to an existing model; fine-tuning retrains model weights on custom data."},
+{d:2, multi:false, q:"In Microsoft Foundry, what is the purpose of 'tracing' or monitoring an agent's execution?", opts:["To visualize and debug the sequence of steps, tool calls, and decisions an agent makes","To encrypt agent communications","To generate billing invoices","To train a new base model"], correct:[0], exp:"Tracing visualizes/debugs an agent's step-by-step execution and tool calls."},
+{d:2, multi:false, q:"Which Azure AI Vision feature would read printed or handwritten text from an image and convert it into machine-readable text?", opts:["Optical Character Recognition (OCR)","Object detection","Image tagging","Spatial analysis"], correct:[0], exp:"OCR converts printed/handwritten text in images into machine-readable text."},
+{d:2, multi:false, q:"You want to give a deployed Foundry agent access to real-time company data stored in SharePoint. Which integration approach is most appropriate?", opts:["Re-train the entire foundation model from scratch","Connect SharePoint as a tool/data source through Foundry's connected resources","Manually copy-paste documents into every prompt","Use Azure AI Custom Vision"], correct:[1], exp:"Connecting SharePoint as a tool/data source is the correct integration pattern."},
+{d:2, multi:false, q:"What is a key benefit of using the unified Microsoft Foundry portal compared to managing individual Azure AI services separately?", opts:["It eliminates the need for any Azure subscription","It provides a single place to discover models, build agents, connect tools, and monitor AI solutions end-to-end","It only supports computer vision workloads","It removes the need for responsible AI safeguards"], correct:[1], exp:"The unified portal centralizes model discovery, agent building, tool connection, and monitoring."},
+{d:2, multi:false, q:"Which scenario is an appropriate use of multimodal AI in Microsoft Foundry?", opts:["An app that takes a photo of a receipt and a voice question, then answers using both inputs","A regression model predicting house prices from square footage alone","A clustering algorithm grouping customers by purchase history","A simple keyword search index"], correct:[0], exp:"Combining image + voice input in one app is a multimodal AI use case."},
+{d:2, multi:false, q:"What does 'retrieval-augmented generation' (RAG) primarily combine?", opts:["Image classification and object detection","A generative model with a retrieval system that fetches relevant external data to ground responses","Speech-to-text and text-to-speech only","Two foundation models trained independently with no shared context"], correct:[1], exp:"RAG combines a generative model with a retrieval system to ground responses in external data."},
+{d:2, multi:true, q:"Which of the following are valid reasons to use Azure AI Content Understanding rather than a general-purpose LLM prompt for document processing? (Select all that apply)", opts:["Need for structured, schema-based field extraction across many similar documents","Need for consistent extraction from forms, invoices, or multimedia at scale","Need to generate creative marketing slogans","Need to play a video game using reinforcement learning"], correct:[0,1], exp:"Content Understanding is best for structured, schema-based extraction at scale across similar documents/forms — not for open-ended creative generation or unrelated tasks."}
+];
+
+const LETTERS = ['A','B','C','D','E'];
+const userAnswers = QUESTIONS.map(()=>new Set());
+let submitted = false;
+
+const root = document.getElementById('quiz-root');
+let currentDomain = null;
+
+QUESTIONS.forEach((item, qi) => {
+  if(item.d !== currentDomain){
+    currentDomain = item.d;
+    const div = document.createElement('div');
+    div.className = 'domain-divider';
+    div.innerHTML = currentDomain === 1
+      ? `<h2>Domain 1 — AI Concepts & Responsible AI</h2><span>Questions 1–22 · ~44% of exam weight</span>`
+      : `<h2>Domain 2 — Implementing AI Solutions with Microsoft Foundry</h2><span>Questions 23–50 · ~56% of exam weight</span>`;
+    root.appendChild(div);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = 'card-' + qi;
+
+  const numDiv = document.createElement('div');
+  numDiv.className = 'q-num';
+  numDiv.textContent = 'QUESTION ' + (qi+1) + ' OF 50';
+  if(item.multi){
+    const tag = document.createElement('span');
+    tag.className = 'q-tag';
+    tag.textContent = 'Multi-select';
+    numDiv.appendChild(tag);
+  }
+  card.appendChild(numDiv);
+
+  const qText = document.createElement('p');
+  qText.className = 'q-text';
+  qText.textContent = item.q;
+  card.appendChild(qText);
+
+  item.opts.forEach((optText, oi) => {
+    const label = document.createElement('label');
+    label.className = 'opt';
+    label.id = `opt-${qi}-${oi}`;
+    const input = document.createElement('input');
+    input.type = item.multi ? 'checkbox' : 'radio';
+    input.name = 'q' + qi;
+    input.value = oi;
+    input.addEventListener('change', () => {
+      if(submitted) return;
+      if(item.multi){
+        if(input.checked) userAnswers[qi].add(oi); else userAnswers[qi].delete(oi);
+      } else {
+        userAnswers[qi] = new Set([oi]);
+      }
+      updateProgress();
+      saveProgress();
+    });
+    const letterSpan = document.createElement('span');
+    letterSpan.className = 'opt-label-letter';
+    letterSpan.textContent = LETTERS[oi] + '.';
+    const textSpan = document.createElement('span');
+    textSpan.textContent = optText;
+    label.appendChild(input);
+    label.appendChild(letterSpan);
+    label.appendChild(textSpan);
+    card.appendChild(label);
+  });
+
+  const status = document.createElement('div');
+  status.className = 'q-status';
+  status.id = 'status-' + qi;
+  card.appendChild(status);
+
+  root.appendChild(card);
+});
+
+function updateProgress(){
+  const answered = userAnswers.filter(s => s.size > 0).length;
+  document.getElementById('progress-fill').style.width = (answered/50*100) + '%';
+  document.getElementById('progress-text').textContent = answered + ' of 50 answered';
+  const btn = document.getElementById('submitBtn');
+  if(answered === 50){
+    btn.disabled = false;
+    btn.textContent = 'Submit exam';
+  } else {
+    btn.disabled = true;
+    btn.textContent = (50 - answered) + ' question' + (50-answered===1?'':'s') + ' remaining';
+  }
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  submitted = true;
+  document.body.classList.add('submitted');
+
+  let correctCount = 0;
+  let d1Total = 0, d1Correct = 0, d2Total = 0, d2Correct = 0;
+
+  QUESTIONS.forEach((item, qi) => {
+    const correctSet = new Set(item.correct);
+    const userSet = userAnswers[qi];
+    const isRight = correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x));
+    if(isRight) correctCount++;
+    if(item.d === 1){ d1Total++; if(isRight) d1Correct++; }
+    else { d2Total++; if(isRight) d2Correct++; }
+
+    item.opts.forEach((optText, oi) => {
+      const optEl = document.getElementById(`opt-${qi}-${oi}`);
+      const input = optEl.querySelector('input');
+      input.disabled = true;
+      if(correctSet.has(oi)){
+        optEl.classList.add('correct-answer');
+      } else if(userSet.has(oi)){
+        optEl.classList.add('wrong-pick');
+      }
+    });
+
+    const statusEl = document.getElementById('status-' + qi);
+    statusEl.classList.add('show');
+    statusEl.innerHTML = `<span class="tag ${isRight ? 'right':'wrong'}">${isRight ? 'Correct' : 'Incorrect'}</span><div class="explain">${item.exp}</div>`;
+  });
+
+  const pct = Math.round(correctCount/50*100);
+  const scaled = Math.round(correctCount/50*1000);
+  const passed = scaled >= 700;
+
+  const banner = document.getElementById('results-banner');
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="score-card">
+      <div class="big-score">${correctCount}/50</div>
+      <div class="scaled">${pct}% correct &nbsp;·&nbsp; scaled score ≈ ${scaled}/1000</div>
+      <div class="pass-pill ${passed ? 'pass':'fail'}">${passed ? 'PASS' : 'BELOW PASSING (700)'}</div>
+      <div class="domain-breakdown">
+        <div>
+          <div class="d-label">Domain 1 · Concepts</div>
+          <div class="d-score">${d1Correct}/${d1Total}</div>
+        </div>
+        <div>
+          <div class="d-label">Domain 2 · Foundry</div>
+          <div class="d-score">${d2Correct}/${d2Total}</div>
+        </div>
+      </div>
+      <br>
+      <button id="jumpToReview">Jump to first question</button>
+      <div class="export-btns">
+        <button class="export-btn pdf" onclick="printPDF()">🖨️ Save as PDF</button>
+        <button class="export-btn dl" onclick="downloadHTML()">⬇️ Download Results HTML</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('jumpToReview').addEventListener('click', () => {
+    document.getElementById('card-0').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ── sessionStorage: save & restore in-progress answers ── */
+function saveProgress(){
+  try{
+    sessionStorage.setItem('ai901_v1', JSON.stringify(userAnswers.map(s=>[...s])));
+  }catch(e){}
+}
+
+function restoreProgress(){
+  try{
+    const raw = sessionStorage.getItem('ai901_v1');
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    data.forEach((arr, qi) => {
+      if(!arr.length) return;
+      userAnswers[qi] = new Set(arr);
+      arr.forEach(oi => {
+        const input = document.querySelector(`input[name="q${qi}"][value="${oi}"]`);
+        if(input) input.checked = true;
+      });
+    });
+    updateProgress();
+  }catch(e){}
+}
+
+/* ── Print to PDF ── */
+function printPDF(){
+  window.print();
+}
+
+/* ── Download static results HTML ── */
+function downloadHTML(){
+  const L = ['A','B','C','D','E'];
+  let correct=0, d1C=0,d1T=0,d2C=0,d2T=0;
+  const results = QUESTIONS.map((item,qi)=>{
+    const cs=new Set(item.correct), us=userAnswers[qi];
+    const ok=cs.size===us.size&&[...cs].every(x=>us.has(x));
+    if(ok)correct++;
+    if(item.d===1){d1T++;if(ok)d1C++;}else{d2T++;if(ok)d2C++;}
+    return{ok,cs,us};
+  });
+  const pct=Math.round(correct/50*100);
+  const scaled=Math.round(correct/50*1000);
+  const passed=scaled>=700;
+  const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  let qHTML='';
+  let curD=null;
+  QUESTIONS.forEach((item,qi)=>{
+    const{ok,cs,us}=results[qi];
+    if(item.d!==curD){
+      curD=item.d;
+      qHTML+=curD===1
+        ?`<div class="domain-div"><h2>DOMAIN 1 — AI CONCEPTS &amp; RESPONSIBLE AI</h2><span>Questions 1–22 · ~44% of exam weight</span></div>`
+        :`<div class="domain-div"><h2>DOMAIN 2 — IMPLEMENTING AI SOLUTIONS WITH MICROSOFT FOUNDRY</h2><span>Questions 23–50 · ~56% of exam weight</span></div>`;
+    }
+    let optsHTML='';
+    item.opts.forEach((t,oi)=>{
+      const isCorrect=cs.has(oi), wasPicked=us.has(oi);
+      const cls=isCorrect?'correct':wasPicked?'wrong':'';
+      const icon=isCorrect?'✓ ':wasPicked?'✗ ':'';
+      optsHTML+=`<div class="opt ${cls}"><span class="lt">${icon}${L[oi]}.</span><span>${t}</span></div>`;
+    });
+    qHTML+=`<div class="q-card">
+      <div class="q-num">QUESTION ${qi+1} OF 50${item.multi?' <span class="mtag">MULTI-SELECT</span>':''}</div>
+      <div class="q-text">${item.q}</div>
+      ${optsHTML}
+      <div class="expl">
+        <span class="badge ${ok?'right':'wrong'}">${ok?'Correct':'Incorrect'}</span>${item.exp}
+      </div>
+    </div>`;
+  });
+
+  const html=`<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI-901 Results — ${date}</title>
+<style>
+:root{--good:#1c6e3e;--good-bg:#e6f4ea;--bad:#a02b2b;--bad-bg:#fbe9e7;--azure:#0a4d8c;--line:#d8d3c4;--ink:#1a2332;--muted:#6b6557;}
+*{box-sizing:border-box;}
+body{margin:0;background:#f7f5f0;color:var(--ink);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.5;padding-bottom:40px;}
+header{background:var(--azure);color:#fff;padding:24px 20px 20px;}
+header h1{margin:0 0 4px;font-size:1.4rem;}
+header p{margin:0;color:#cfe3f5;font-size:0.85rem;}
+main{max-width:700px;margin:0 auto;padding:20px;}
+.score-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;text-align:center;margin-bottom:24px;}
+.big{font-size:2.4rem;font-weight:800;color:var(--azure);line-height:1;}
+.sub{color:var(--muted);font-size:0.9rem;margin-top:4px;}
+.pill{display:inline-block;margin-top:10px;padding:5px 16px;border-radius:20px;font-weight:700;font-size:0.85rem;}
+.pill.pass{background:var(--good-bg);color:var(--good);}
+.pill.fail{background:var(--bad-bg);color:var(--bad);}
+.breakdown{display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;}
+.breakdown div{flex:1;min-width:120px;background:#f7f5f0;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:left;}
+.dl{font-size:0.7rem;color:var(--muted);text-transform:uppercase;}
+.ds{font-size:1.2rem;font-weight:700;}
+.domain-div{margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+.domain-div h2{font-size:0.9rem;margin:0;letter-spacing:0.04em;}
+.domain-div span{font-size:0.74rem;color:var(--muted);}
+.q-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;page-break-inside:avoid;break-inside:avoid;}
+.q-num{font-size:0.7rem;font-weight:700;color:#0f6cbd;letter-spacing:0.04em;margin-bottom:6px;}
+.mtag{font-size:0.6rem;background:#f0ede4;border:1px solid var(--line);border-radius:10px;padding:1px 6px;margin-left:6px;color:var(--muted);font-weight:400;}
+.q-text{font-size:0.95rem;font-weight:600;margin:0 0 10px;}
+.opt{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:7px;margin-bottom:5px;border:1px solid transparent;font-size:0.88rem;}
+.opt.correct{background:var(--good-bg);border-color:var(--good);}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);}
+.lt{font-weight:700;flex-shrink:0;min-width:22px;}
+.opt.correct .lt{color:var(--good);}
+.opt.wrong .lt{color:var(--bad);}
+.expl{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:0.84rem;color:var(--ink);}
+.badge{display:inline-block;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:6px;}
+.badge.right{background:var(--good-bg);color:var(--good);}
+.badge.wrong{background:var(--bad-bg);color:var(--bad);}
+@media print{
+  body{background:#fff!important;}
+  .opt.correct,.opt.wrong,.badge,.pill{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .q-card{break-inside:avoid;}
+}
+</style></head>
+<body>
+<header>
+  <h1>AI-901 Practice Exam — Results</h1>
+  <p>Completed ${date}</p>
+</header>
+<main>
+  <div class="score-card">
+    <div class="big">${correct}/50</div>
+    <div class="sub">${pct}% correct &nbsp;·&nbsp; scaled score ≈ ${scaled}/1000</div>
+    <div class="pill ${passed?'pass':'fail'}">${passed?'PASS':'BELOW PASSING (700)'}</div>
+    <div class="breakdown">
+      <div><div class="dl">Domain 1 · Concepts</div><div class="ds">${d1C}/${d1T}</div></div>
+      <div><div class="dl">Domain 2 · Foundry</div><div class="ds">${d2C}/${d2T}</div></div>
+    </div>
+  </div>
+  ${qHTML}
+</main>
+</body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='AI-901_Results_'+new Date().toISOString().slice(0,10)+'.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+updateProgress();
+restoreProgress();
+</script>
+
+</body>
+</html>
